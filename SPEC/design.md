@@ -5,3 +5,5 @@ https://color.adobe.com/create/color-wheel?color-palette=65121A%2C0B0B0B%2CEED44
 
 
 Fontes: IBM Plex Sans, PT Serif e Noto Sans
+
+bibliotecas de icones: Lucide,Font Awesome e tabler icons
