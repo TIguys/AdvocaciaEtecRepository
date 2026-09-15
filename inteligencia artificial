@@ -1,0 +1,173 @@
+import requests
+
+import json
+
+# Configurações da API da OpenRouter
+
+API_KEY = "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"
+
+MODELO = "nvidia/nemotron-3-ultra-550b-a55b:free"
+
+URL = "https://openrouter.ai/api/v1/chat/completions"
+
+# Cabeçalhos de autenticação exigidos pela OpenRouter
+
+headers = {
+
+    "Authorization": f"Bearer {API_KEY}",
+
+    "Content-Type": "application/json",
+
+    "HTTP-Referer": "https://undergpt.local", # URL do seu site (pode ser fictícia em testes)
+
+    "X-Title": "law ai"                # Nome da sua aplicação
+
+}
+
+# O histórico de mensagens começa com as instruções de comportamento do UnderGPT
+
+mensagens = [
+
+    {
+
+        "role": "system",
+
+        "content": (
+
+            "Você é a law ai, um assistente virtual altamente serio e especialista na area de advocacia "
+
+            "absoluto em advocacia e jurisdiçao, onde voce ajuda o advogado identificar possiveis clausulas, penas e possiveis cenarios na audiencia . "
+
+            "Responda sempre em português do Brasil e caso identificado outro idioma alem desse avisar que vc nao atende tal idioma. Traga sempre o codigo penal ou lei com a descriçao dela, "
+
+            "respeitoso e explicativo relacionado à pergunta do usuário."
+
+        )
+
+    }
+
+]
+
+print("="*50)
+
+print(" law ai- ola doutor(a)")
+
+print("Digite 'sair' a qualquer momento para encerrar.")
+
+print("="*50)
+
+while True:
+
+    # 1. Recebe a pergunta do usuário
+
+    pergunta = input("\nVocê: ")
+
+    if pergunta.lower() in ['sair', 'exit', 'quit']:
+
+        print("law ai: Até a próxima! Continue dr(a).")
+
+        break
+
+    # 2. Adiciona a pergunta do usuário ao histórico da conversa
+
+    mensagens.append({"role": "user", "content": pergunta})
+
+    # 3. Prepara o pacote de dados para enviar à API
+
+    payload = {
+
+        "model": MODELO,
+
+        "messages": mensagens
+
+    }
+
+    try:
+
+        # 4. Faz a requisição HTTP POST para a OpenRouter
+
+        resposta = requests.post(URL, headers=headers, data=json.dumps(payload))
+
+        # Verifica se houve algum erro na requisição (ex: 401 Não autorizado, 500 Erro no servidor)
+
+        resposta.raise_for_status()
+
+        # 5. Extrai a resposta da IA do JSON retornado
+
+        dados_resposta = resposta.json()
+
+        texto_law ai = dados_resposta['choices'][0]['message']['content']
+
+        print(f"\njarvis: {texto_undergpt}")
+
+        # 6. Salva a resposta da IA no histórico para que ela tenha contexto nas próximas perguntas
+
+        mensagens.append({"role": "assistant", "content": texto_undergpt})
+
+    except requests.exceptions.RequestException as erro:
+
+        print(f"\n[ERRO] Ocorreu um problema ao conectar com a API: {erro}")
+
+        # Se der erro (ex: limite de uso), removemos a última mensagem do usuário para não dessincronizar o histórico
+
+        mensagens.pop()
+
+        import os
+from dotenv import load_dotenv
+from openai import OpenAI
+import gradio as gr
+
+load_dotenv()
+
+client = OpenAI(
+    api_key=os.getenv("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"),
+    base_url="https://openrouter.ai/api/v1",
+)
+
+MODEL = "nvidia/nemotron-3-super-120b-a12b:free"
+
+
+def responder(message, history):
+    messages = [
+        {
+            "role": "system",
+            "content": "Você é um assistente inteligente, útil e responde em português."
+        }
+    ]
+
+    if history:
+        for user, assistant in history:
+            messages.append({"role": "user", "content": user})
+            messages.append({"role": "assistant", "content": assistant})
+
+    messages.append({"role": "user", "content": message})
+
+    try:
+        response = client.chat.completions.create(
+            model=MODEL,
+            messages=messages,
+            temperature=0.7,
+            max_tokens=2048,
+        )
+
+        return response.choices[0].message.content
+
+    except Exception as e:
+        return f"Erro: {e}"
+
+
+demo = gr.ChatInterface(
+    fn=responder,
+    title="law ai",
+    description="Chat usando OpenRouter",
+    theme=gr.themes.Soft(),
+    chatbot=gr.Chatbot(height=600),
+    textbox=gr.Textbox(
+        placeholder="Digite sua pergunta...",
+        lines=2,
+    ),
+)
+
+if __name__ == "__main__":
+    demo.launch()
+
