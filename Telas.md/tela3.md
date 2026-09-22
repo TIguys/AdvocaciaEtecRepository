@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-
 <html lang="pt-BR"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" name="viewport"/><title>JurisApp SaaS</title><link href="https://fonts.googleapis.com" rel="preconnect"/><link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/><link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&amp;family=Noto+Sans:wght@400;600&amp;family=PT+Serif:ital,wght@0,400;0,700;1,400&amp;display=swap" rel="stylesheet"/><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/><style>@layer base{html,body{width:100vw;margin:0;padding:0;}body{overscroll-behavior:none;}.pb-safe{padding-bottom:env(safe-area-inset-bottom,0px);}.pt-safe{padding-top:env(safe-area-inset-top,0px);}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}::-webkit-scrollbar{display:none;}</style><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config = { darkMode: "class", theme: { extend: { colors: { "on-primary-container": "#ec797a", "on-tertiary-fixed": "#1b1b20", "secondary": "#6d5e00", "primary": "#450009", "tertiary-fixed-dim": "#c7c6cc", "on-tertiary-fixed-variant": "#46464c", "on-error": "#ffffff", "on-primary": "#ffffff", "surface-container-high": "#ebe7e7", "on-secondary-fixed-variant": "#524600", "secondary-fixed-dim": "#e0c640", "on-primary-fixed-variant": "#80272c", "surface-tint": "#9f3e42", "outline": "#897271", "surface-dim": "#dcd9d9", "on-secondary-fixed": "#211b00", "inverse-primary": "#ffb3b2", "tertiary-container": "#323237", "on-background": "#1c1b1b", "error": "#ba1a1a", "secondary-container": "#fae057", "tertiary-fixed": "#e3e1e8", "on-tertiary-container": "#9b9aa0", "surface-container-low": "#f6f3f2", "secondary-fixed": "#fde25a", "on-surface": "#1c1b1b", "error-container": "#ffdad6", "on-surface-variant": "#564241", "on-error-container": "#93000a", "background": "#fcf8f8", "on-primary-fixed": "#410008", "surface-bright": "#fcf8f8", "surface": "#fcf8f8", "outline-variant": "#dcc0bf", "inverse-surface": "#313030", "surface-variant": "#e5e2e1", "on-tertiary": "#ffffff", "inverse-on-surface": "#f3f0ef", "tertiary": "#1d1d22", "primary-fixed-dim": "#ffb3b2", "surface-container-highest": "#e5e2e1", "on-secondary": "#ffffff", "primary-fixed": "#ffdad9", "surface-container-lowest": "#ffffff", "on-secondary-container": "#726200", "primary-container": "#65121a", "surface-container": "#f0edec" }, borderRadius: { "DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem" }, spacing: { "space-xl": "2rem", "margin": "1rem", "space-md": "1rem", "space-lg": "1.5rem", "gutter": "1rem", "space-sm": "0.5rem", "space-xs": "0.25rem" }, fontFamily: { "form-input": ["Noto Sans"], "form-label": ["Noto Sans"], "label-md": ["IBM Plex Sans"], "body-md": ["IBM Plex Sans"], "body-sm": ["IBM Plex Sans"], "headline-md": ["PT Serif"], "headline-lg": ["PT Serif"], "body-lg": ["IBM Plex Sans"], "form-helper": ["Noto Sans"], "display-lg": ["PT Serif"], "headline-sm": ["PT Serif"], "label-sm": ["IBM Plex Sans"] }, fontSize: { "form-input": ["15px", { "lineHeight": "22px", "fontWeight": "400" }], "form-label": ["12px", { "lineHeight": "16px", "letterSpacing": "0.02em", "fontWeight": "600" }], "label-md": ["13px", { "lineHeight": "18px", "letterSpacing": "0.01em", "fontWeight": "600" }], "body-md": ["14px", { "lineHeight": "20px", "fontWeight": "400" }], "body-sm": ["12px", { "lineHeight": "16px", "fontWeight": "400" }], "headline-md": ["20px", { "lineHeight": "28px", "fontWeight": "600" }], "headline-lg": ["24px", { "lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "700" }], "body-lg": ["16px", { "lineHeight": "24px", "fontWeight": "400" }], "form-helper": ["11px", { "lineHeight": "14px", "fontWeight": "400" }], "display-lg": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "700" }], "headline-sm": ["18px", { "lineHeight": "24px", "fontWeight": "600" }], "label-sm": ["11px", { "lineHeight": "14px", "letterSpacing": "0.04em", "fontWeight": "600" }] } } } };</script></head><body class="bg-surface text-on-surface font-body-md text-body-md antialiased min-h-screen flex flex-col"><header class="fixed top-0 inset-x-0 z-50 bg-primary-container text-on-primary pt-safe shadow-[0_4px_12px_rgba(0,0,0,0.15)]"><div class="h-14 px-margin flex items-center justify-between"><div class="flex items-center gap-space-sm min-w-0"><img alt="Juris Logo" class="h-8 w-auto object-contain" src="https://lh3.googleusercontent.com/aida/AEtjO1UvpLoDUjQJyWqwqxiW_lvmyOs3A49QN-PYWLbiGQRY9wV9mQfKCqyD2u93b5YWKRCpXNUtDxBlZJI2VPSTmYXMyHoULMkPswaUwYdnZVL4YLiiwvUlKrmahnZqTRVgyc-1BHMzGe3fswnPRkfAbQMenh1hWe8ZDqGEISTC0dhqtJBwvZNFktiefHDhstuo8NLzQ0XZIO5nqtfUTC7A0hiUkbgc5EGdEJbLcjNU5bw5WzKcN2j-2EBh8J8"/><div class="flex flex-col min-w-0"><span class="font-headline-sm text-headline-sm tracking-tight text-on-primary truncate">JurisTech</span><span class="font-label-sm text-label-sm text-secondary-container tracking-wider uppercase truncate">Advogados</span></div></div><div class="flex items-center gap-space-xs"><button aria-label="Notificações" class="w-11 h-11 flex items-center justify-center rounded-full text-on-primary hover:text-secondary-container transition-colors" type="button"><span class="material-symbols-outlined text-[22px]">notifications</span></button><div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center"><span class="material-symbols-outlined text-on-primary text-[18px]">person</span></div></div></div></header><main class="flex-1 flex flex-col relative w-full pt-14 pb-20 bg-surface px-margin"><div class="flex flex-col w-full pb-10">
 <!-- Floating Feedback Toast / Micro-alert -->
@@ -376,7 +375,6 @@
       target.classList.toggle('hidden');
     }
   }
-
   function openDeleteModal(lawyerName) {
     const modal = document.getElementById('delete-modal');
     const desc = document.getElementById('delete-modal-desc');
@@ -386,25 +384,21 @@
     // close open popups
     document.querySelectorAll('[id^="menu-"]').forEach(m => m.classList.add('hidden'));
   }
-
   function closeDeleteModal() {
     const modal = document.getElementById('delete-modal');
     modal.classList.add('hidden');
     modal.classList.remove('flex');
   }
-
   function openNewModal() {
     const modal = document.getElementById('new-lawyer-modal');
     modal.classList.remove('hidden');
     modal.classList.add('flex');
   }
-
   function closeNewModal() {
     const modal = document.getElementById('new-lawyer-modal');
     modal.classList.add('hidden');
     modal.classList.remove('flex');
   }
-
   // Dismiss dropdowns on background click
   document.addEventListener('click', (e) => {
     if (!e.target.closest('[onclick^="toggleCardMenu"]') && !e.target.closest('[id^="menu-"]')) {
