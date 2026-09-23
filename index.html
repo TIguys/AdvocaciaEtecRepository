@@ -65,10 +65,10 @@
 
       <!-- Logo e Identidade -->
       <div class="flex items-center gap-4">
-        <div class="w-10 h-10 rounded-lg bg-brand-800 flex items-center justify-center text-gold-400 font-serif font-bold text-xl shadow-md">
+        <div class="w-10 h-10 rounded-lg bg-brand-800 flex items-center justify-center text-gold-400 font-serif font-bold text-xl shadow-md cursor-pointer" onclick="navegarPara('dashboard')">
           ⚖️
         </div>
-        <div class="flex flex-col">
+        <div class="flex flex-col cursor-pointer" onclick="navegarPara('dashboard')">
           <span class="font-serif text-xl font-bold tracking-tight text-brand-900 dark:text-stone-100 leading-none">Advocacia ETEC</span>
           <span class="text-[11px] uppercase tracking-[0.2em] text-stone-500 dark:text-stone-400 font-medium font-ui mt-1">Gestão Jurídica Inteligente</span>
         </div>
@@ -76,22 +76,22 @@
 
       <!-- Navegação SPA Desktop -->
       <nav class="hidden md:flex items-center gap-7 font-ui text-sm">
-        <a class="nav-link active font-semibold text-brand-800 dark:text-gold-400 border-b-2 border-brand-800 dark:border-gold-400 pb-1 transition-colors cursor-pointer" data-view="dashboard">
+        <a class="nav-link active font-semibold text-brand-800 dark:text-gold-400 border-b-2 border-brand-800 dark:border-gold-400 pb-1 transition-colors cursor-pointer" data-view="dashboard" onclick="navegarPara('dashboard')">
           Dashboard
         </a>
-        <a class="nav-link text-stone-600 dark:text-stone-400 hover:text-stone-900 dark:hover:text-stone-100 pb-1 transition-colors cursor-pointer" data-view="consultas">
+        <a class="nav-link text-stone-600 dark:text-stone-400 hover:text-stone-900 dark:hover:text-stone-100 pb-1 transition-colors cursor-pointer" data-view="consultas" onclick="navegarPara('consultas')">
           Consultas & Agenda
         </a>
-        <a class="nav-link text-stone-600 dark:text-stone-400 hover:text-stone-900 dark:hover:text-stone-100 pb-1 transition-colors cursor-pointer" data-view="advogados">
+        <a class="nav-link text-stone-600 dark:text-stone-400 hover:text-stone-900 dark:hover:text-stone-100 pb-1 transition-colors cursor-pointer" data-view="advogados" onclick="navegarPara('advogados')">
           Advogados
         </a>
-        <a class="nav-link text-stone-600 dark:text-stone-400 hover:text-stone-900 dark:hover:text-stone-100 pb-1 transition-colors cursor-pointer" data-view="clientes">
+        <a class="nav-link text-stone-600 dark:text-stone-400 hover:text-stone-900 dark:hover:text-stone-100 pb-1 transition-colors cursor-pointer" data-view="clientes" onclick="navegarPara('clientes')">
           Clientes
         </a>
-        <a class="nav-link text-stone-600 dark:text-stone-400 hover:text-stone-900 dark:hover:text-stone-100 pb-1 transition-colors cursor-pointer" data-view="relatorios">
+        <a class="nav-link text-stone-600 dark:text-stone-400 hover:text-stone-900 dark:hover:text-stone-100 pb-1 transition-colors cursor-pointer" data-view="relatorios" onclick="navegarPara('relatorios')">
           Relatórios
         </a>
-        <a class="nav-link text-stone-600 dark:text-stone-400 hover:text-stone-900 dark:hover:text-stone-100 pb-1 transition-colors cursor-pointer flex items-center gap-1" data-view="lawai">
+        <a class="nav-link text-stone-600 dark:text-stone-400 hover:text-stone-900 dark:hover:text-stone-100 pb-1 transition-colors cursor-pointer flex items-center gap-1" data-view="lawai" onclick="navegarPara('lawai')">
           <span class="text-xs bg-brand-800 text-gold-400 px-1.5 py-0.5 rounded font-bold">IA</span> Law AI
         </a>
       </nav>
@@ -117,6 +117,16 @@
           </div>
         </div>
       </div>
+    </div>
+
+    <!-- Navegação Responsiva Mobile -->
+    <div class="md:hidden border-t border-stone-200 dark:border-stone-800 bg-stone-50 dark:bg-darkcard px-4 py-2 flex items-center justify-around text-xs font-ui overflow-x-auto">
+      <button class="nav-link-mobile px-2 py-1 font-semibold text-brand-800 dark:text-gold-400" onclick="navegarPara('dashboard')">Dashboard</button>
+      <button class="nav-link-mobile px-2 py-1 text-stone-600 dark:text-stone-300" onclick="navegarPara('consultas')">Consultas</button>
+      <button class="nav-link-mobile px-2 py-1 text-stone-600 dark:text-stone-300" onclick="navegarPara('advogados')">Advogados</button>
+      <button class="nav-link-mobile px-2 py-1 text-stone-600 dark:text-stone-300" onclick="navegarPara('clientes')">Clientes</button>
+      <button class="nav-link-mobile px-2 py-1 text-stone-600 dark:text-stone-300" onclick="navegarPara('relatorios')">Relatórios</button>
+      <button class="nav-link-mobile px-2 py-1 text-stone-600 dark:text-stone-300 font-bold" onclick="navegarPara('lawai')">Law AI</button>
     </div>
   </header>
 
@@ -158,11 +168,11 @@
 
         <!-- Atalhos Rápidos (F6) -->
         <div class="flex items-center gap-3 font-ui">
-          <button id="btn-dash-novo-cliente" class="inline-flex items-center gap-2 px-4 py-2.5 text-xs font-semibold text-stone-800 dark:text-stone-200 bg-white dark:bg-darksurface border border-stone-300 dark:border-stone-700 rounded-lg hover:bg-stone-50 dark:hover:bg-darkcard transition-all shadow-sm">
+          <button id="btn-dash-novo-cliente" onclick="abrirModalCliente()" class="inline-flex items-center gap-2 px-4 py-2.5 text-xs font-semibold text-stone-800 dark:text-stone-200 bg-white dark:bg-darksurface border border-stone-300 dark:border-stone-700 rounded-lg hover:bg-stone-50 dark:hover:bg-darkcard transition-all shadow-sm">
             <span class="material-symbols-outlined text-[18px]">person_add</span>
             Novo Cliente
           </button>
-          <button id="btn-dash-nova-consulta" class="inline-flex items-center gap-2 px-4 py-2.5 text-xs font-semibold text-white bg-brand-800 hover:bg-brand-900 dark:bg-brand-700 dark:hover:bg-brand-800 rounded-lg transition-all shadow-sm">
+          <button id="btn-dash-nova-consulta" onclick="abrirModalConsulta()" class="inline-flex items-center gap-2 px-4 py-2.5 text-xs font-semibold text-white bg-brand-800 hover:bg-brand-900 dark:bg-brand-700 dark:hover:bg-brand-800 rounded-lg transition-all shadow-sm">
             <span class="material-symbols-outlined text-[18px]">add_circle</span>
             Nova Consulta
           </button>
@@ -172,7 +182,7 @@
       <!-- Cards de Métricas Principais (F6) -->
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
         <!-- Card 1: Consultas Hoje -->
-        <div class="p-6 bg-white dark:bg-darksurface border border-stone-200/80 dark:border-stone-800 rounded-xl shadow-sm">
+        <div class="p-6 bg-white dark:bg-darksurface border border-stone-200/80 dark:border-stone-800 rounded-xl shadow-sm cursor-pointer hover:border-brand-800 transition-colors" onclick="navegarPara('consultas')">
           <div class="flex items-center justify-between text-stone-400 mb-2">
             <span class="text-xs uppercase tracking-wider font-semibold text-stone-500 dark:text-stone-400 font-ui">Consultas de Hoje</span>
             <span class="material-symbols-outlined text-brand-700 dark:text-gold-400 text-[22px]">calendar_today</span>
@@ -184,7 +194,7 @@
         </div>
 
         <!-- Card 2: Clientes Cadastrados -->
-        <div class="p-6 bg-white dark:bg-darksurface border border-stone-200/80 dark:border-stone-800 rounded-xl shadow-sm">
+        <div class="p-6 bg-white dark:bg-darksurface border border-stone-200/80 dark:border-stone-800 rounded-xl shadow-sm cursor-pointer hover:border-brand-800 transition-colors" onclick="navegarPara('clientes')">
           <div class="flex items-center justify-between text-stone-400 mb-2">
             <span class="text-xs uppercase tracking-wider font-semibold text-stone-500 dark:text-stone-400 font-ui">Total de Clientes</span>
             <span class="material-symbols-outlined text-stone-400 text-[22px]">group</span>
@@ -196,7 +206,7 @@
         </div>
 
         <!-- Card 3: Advogados na Banca -->
-        <div class="p-6 bg-white dark:bg-darksurface border border-stone-200/80 dark:border-stone-800 rounded-xl shadow-sm">
+        <div class="p-6 bg-white dark:bg-darksurface border border-stone-200/80 dark:border-stone-800 rounded-xl shadow-sm cursor-pointer hover:border-brand-800 transition-colors" onclick="navegarPara('advogados')">
           <div class="flex items-center justify-between text-stone-400 mb-2">
             <span class="text-xs uppercase tracking-wider font-semibold text-stone-500 dark:text-stone-400 font-ui">Corpo Jurídico</span>
             <span class="material-symbols-outlined text-stone-400 text-[22px]">gavel</span>
@@ -208,7 +218,7 @@
         </div>
 
         <!-- Card 4: Faturamento do Mês -->
-        <div class="p-6 bg-white dark:bg-darksurface border border-stone-200/80 dark:border-stone-800 rounded-xl shadow-sm">
+        <div class="p-6 bg-white dark:bg-darksurface border border-stone-200/80 dark:border-stone-800 rounded-xl shadow-sm cursor-pointer hover:border-brand-800 transition-colors" onclick="navegarPara('relatorios')">
           <div class="flex items-center justify-between text-stone-400 mb-2">
             <span class="text-xs uppercase tracking-wider font-semibold text-stone-500 dark:text-stone-400 font-ui">Honorários do Mês</span>
             <span class="material-symbols-outlined text-gold-600 text-[22px]">payments</span>
@@ -230,7 +240,7 @@
                 <h2 class="text-xl font-serif font-semibold text-stone-900 dark:text-stone-100">Próximas Consultas</h2>
                 <p class="text-xs text-stone-500 dark:text-stone-400 font-ui mt-0.5">Atendimentos pautados na agenda</p>
               </div>
-              <a class="nav-link text-xs font-ui text-brand-800 dark:text-gold-400 hover:underline cursor-pointer font-semibold inline-flex items-center gap-1" data-view="consultas">
+              <a class="nav-link text-xs font-ui text-brand-800 dark:text-gold-400 hover:underline cursor-pointer font-semibold inline-flex items-center gap-1" data-view="consultas" onclick="navegarPara('consultas')">
                 Ver agenda completa →
               </a>
             </div>
@@ -287,7 +297,7 @@
           <span class="text-xs uppercase tracking-widest text-stone-500 dark:text-stone-400 font-ui font-medium">Gestão de Carteira</span>
           <h1 class="text-3xl font-serif text-stone-900 dark:text-stone-100 tracking-tight mt-1">Clientes</h1>
         </div>
-        <button id="btn-novo-cliente" class="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg bg-brand-800 hover:bg-brand-900 text-white text-xs font-semibold shadow-sm transition-all">
+        <button id="btn-novo-cliente" onclick="abrirModalCliente()" class="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg bg-brand-800 hover:bg-brand-900 text-white text-xs font-semibold shadow-sm transition-all">
           <span class="material-symbols-outlined text-[18px]">add</span>
           Novo Cliente
         </button>
@@ -331,7 +341,7 @@
           <span class="text-xs uppercase tracking-widest text-stone-500 dark:text-stone-400 font-ui font-medium">Corpo Jurídico</span>
           <h1 class="text-3xl font-serif text-stone-900 dark:text-stone-100 tracking-tight mt-1">Advogados</h1>
         </div>
-        <button id="btn-novo-advogado" class="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg bg-brand-800 hover:bg-brand-900 text-white text-xs font-semibold shadow-sm transition-all">
+        <button id="btn-novo-advogado" onclick="abrirModalAdvogado()" class="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg bg-brand-800 hover:bg-brand-900 text-white text-xs font-semibold shadow-sm transition-all">
           <span class="material-symbols-outlined text-[18px]">person_add</span>
           Novo Advogado
         </button>
@@ -343,7 +353,7 @@
       </div>
     </section>
 
-    <!-- ================================================= realm -->
+    <!-- ======================================================== -->
     <!-- VISÃO 4: CONSULTAS & AGENDAMENTO COM CÁLCULO OAB (F3 + F4) -->
     <!-- ======================================================== -->
     <section id="view-consultas" class="spa-view hidden space-y-6">
@@ -352,7 +362,7 @@
           <span class="text-xs uppercase tracking-widest text-stone-500 dark:text-stone-400 font-ui font-medium">Agendamento & Tabela OAB</span>
           <h1 class="text-3xl font-serif text-stone-900 dark:text-stone-100 tracking-tight mt-1">Consultas & Agenda</h1>
         </div>
-        <button id="btn-nova-consulta" class="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg bg-brand-800 hover:bg-brand-900 text-white text-xs font-semibold shadow-sm transition-all">
+        <button id="btn-nova-consulta" onclick="abrirModalConsulta()" class="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg bg-brand-800 hover:bg-brand-900 text-white text-xs font-semibold shadow-sm transition-all">
           <span class="material-symbols-outlined text-[18px]">add_circle</span>
           Agendar Nova Consulta
         </button>
@@ -521,7 +531,7 @@
         <!-- Input do Chat -->
         <div class="mt-4 pt-3 border-t border-stone-200 dark:border-stone-800 flex items-center gap-2">
           <input id="lawai-input-msg" type="text" placeholder="Digite sua dúvida jurídica (ex: pena para estelionato)..." class="flex-1 px-4 py-2.5 rounded-lg border border-stone-300 dark:border-stone-700 bg-stone-50 dark:bg-darkcard text-stone-900 dark:text-stone-100 text-xs focus:outline-none focus:border-brand-800"/>
-          <button id="lawai-btn-send" class="px-4 py-2.5 bg-brand-800 hover:bg-brand-900 text-white rounded-lg text-xs font-semibold flex items-center gap-1">
+          <button id="lawai-btn-send" onclick="enviarMensagemLawAI()" class="px-4 py-2.5 bg-brand-800 hover:bg-brand-900 text-white rounded-lg text-xs font-semibold flex items-center gap-1">
             <span class="material-symbols-outlined text-[18px]">send</span>
             Enviar
           </button>
@@ -548,11 +558,11 @@
   <!-- ======================================================== -->
 
   <!-- MODAL 1: CLIENTE (F1) -->
-  <div id="modal-cliente" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4 bg-black/50 backdrop-blur-xs">
-    <div class="bg-white dark:bg-darksurface w-full max-w-lg rounded-xl shadow-xl border border-stone-200 dark:border-stone-800 overflow-hidden">
+  <div id="modal-cliente" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4 bg-black/50 backdrop-blur-xs modal-backdrop" onclick="fecharModalOnBackdrop(event, 'modal-cliente')">
+    <div class="bg-white dark:bg-darksurface w-full max-w-lg rounded-xl shadow-xl border border-stone-200 dark:border-stone-800 overflow-hidden" onclick="event.stopPropagation()">
       <div class="px-6 py-4 border-b border-stone-200 dark:border-stone-800 flex items-center justify-between">
         <h2 id="modal-cliente-titulo" class="font-serif text-lg font-semibold text-stone-900 dark:text-stone-100">Cadastrar Cliente</h2>
-        <button class="btn-close-modal text-stone-400 hover:text-stone-600"><span class="material-symbols-outlined">close</span></button>
+        <button class="btn-close-modal text-stone-400 hover:text-stone-600" onclick="fecharModal('modal-cliente')"><span class="material-symbols-outlined">close</span></button>
       </div>
 
       <form id="form-cliente" class="p-6 space-y-4 text-xs font-ui">
@@ -581,7 +591,7 @@
         </div>
 
         <div class="pt-3 flex justify-end gap-2">
-          <button type="button" class="btn-close-modal px-4 py-2 text-stone-600 dark:text-stone-400 font-semibold">Cancelar</button>
+          <button type="button" class="btn-close-modal px-4 py-2 text-stone-600 dark:text-stone-400 font-semibold" onclick="fecharModal('modal-cliente')">Cancelar</button>
           <button type="submit" class="px-4 py-2 bg-brand-800 hover:bg-brand-900 text-white rounded-lg font-semibold shadow-sm">Salvar Cliente</button>
         </div>
       </form>
@@ -589,11 +599,11 @@
   </div>
 
   <!-- MODAL 2: ADVOGADO (F2) -->
-  <div id="modal-advogado" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4 bg-black/50 backdrop-blur-xs">
-    <div class="bg-white dark:bg-darksurface w-full max-w-lg rounded-xl shadow-xl border border-stone-200 dark:border-stone-800 overflow-hidden">
+  <div id="modal-advogado" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4 bg-black/50 backdrop-blur-xs modal-backdrop" onclick="fecharModalOnBackdrop(event, 'modal-advogado')">
+    <div class="bg-white dark:bg-darksurface w-full max-w-lg rounded-xl shadow-xl border border-stone-200 dark:border-stone-800 overflow-hidden" onclick="event.stopPropagation()">
       <div class="px-6 py-4 border-b border-stone-200 dark:border-stone-800 flex items-center justify-between">
         <h2 id="modal-advogado-titulo" class="font-serif text-lg font-semibold text-stone-900 dark:text-stone-100">Cadastrar Advogado</h2>
-        <button class="btn-close-modal text-stone-400 hover:text-stone-600"><span class="material-symbols-outlined">close</span></button>
+        <button class="btn-close-modal text-stone-400 hover:text-stone-600" onclick="fecharModal('modal-advogado')"><span class="material-symbols-outlined">close</span></button>
       </div>
 
       <form id="form-advogado" class="p-6 space-y-4 text-xs font-ui">
@@ -643,7 +653,7 @@
         </div>
 
         <div class="pt-3 flex justify-end gap-2">
-          <button type="button" class="btn-close-modal px-4 py-2 text-stone-600 dark:text-stone-400 font-semibold">Cancelar</button>
+          <button type="button" class="btn-close-modal px-4 py-2 text-stone-600 dark:text-stone-400 font-semibold" onclick="fecharModal('modal-advogado')">Cancelar</button>
           <button type="submit" class="px-4 py-2 bg-brand-800 hover:bg-brand-900 text-white rounded-lg font-semibold shadow-sm">Salvar Advogado</button>
         </div>
       </form>
@@ -651,11 +661,11 @@
   </div>
 
   <!-- MODAL 3: AGENDAR CONSULTA COM CÁLCULO OAB (F3 + F4) -->
-  <div id="modal-consulta" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4 bg-black/50 backdrop-blur-xs">
-    <div class="bg-white dark:bg-darksurface w-full max-w-xl rounded-xl shadow-xl border border-stone-200 dark:border-stone-800 overflow-hidden">
+  <div id="modal-consulta" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4 bg-black/50 backdrop-blur-xs modal-backdrop" onclick="fecharModalOnBackdrop(event, 'modal-consulta')">
+    <div class="bg-white dark:bg-darksurface w-full max-w-xl rounded-xl shadow-xl border border-stone-200 dark:border-stone-800 overflow-hidden" onclick="event.stopPropagation()">
       <div class="px-6 py-4 border-b border-stone-200 dark:border-stone-800 flex items-center justify-between">
         <h2 class="font-serif text-lg font-semibold text-stone-900 dark:text-stone-100">Agendar Consulta Jurídica</h2>
-        <button class="btn-close-modal text-stone-400 hover:text-stone-600"><span class="material-symbols-outlined">close</span></button>
+        <button class="btn-close-modal text-stone-400 hover:text-stone-600" onclick="fecharModal('modal-consulta')"><span class="material-symbols-outlined">close</span></button>
       </div>
 
       <form id="form-consulta" class="p-6 space-y-4 text-xs font-ui">
@@ -734,7 +744,7 @@
         </div>
 
         <div class="pt-3 flex justify-end gap-2">
-          <button type="button" class="btn-close-modal px-4 py-2 text-stone-600 dark:text-stone-400 font-semibold">Cancelar</button>
+          <button type="button" class="btn-close-modal px-4 py-2 text-stone-600 dark:text-stone-400 font-semibold" onclick="fecharModal('modal-consulta')">Cancelar</button>
           <button type="submit" class="px-4 py-2 bg-brand-800 hover:bg-brand-900 text-white rounded-lg font-semibold shadow-sm">Confirmar Agendamento</button>
         </div>
       </form>
