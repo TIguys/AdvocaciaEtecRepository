@@ -1,8 +1,88 @@
 /**
- * Advocacia ETEC - Lógica de Controle SPA e Interatividade Refatorada
+ * Advocacia ETEC - Lógica de Controle SPA, Autenticação e Interatividade
  */
 
 // REGISTRO DE FUNÇÕES GLOBAIS NO ESCOPO WINDOW PARA FUNCIONALIDADE TOTAL DOS BOTÕES
+
+// === AUTENTICAÇÃO E SESSÃO DO USUÁRIO ===
+window.loginRapido = function(tipo) {
+  let user = {
+    id: 'user-1',
+    name: 'Secretaria Central',
+    role: 'Operacional • ETEC Bragança',
+    badge: 'SEC',
+    email: 'secretaria@advocaciaetec.com.br'
+  };
+
+  if (tipo === 'advogado') {
+    user = {
+      id: 'user-2',
+      name: 'Dr. Carlos Eduardo',
+      role: 'Sócio-Diretor • OAB/SP 123456',
+      badge: 'CE',
+      email: 'carlos.eduardo@advocaciaetec.com.br'
+    };
+  }
+
+  db.setSession(user);
+  iniciarSessaoUI(user);
+  window.showToast(`Bem-vindo(a), ${user.name}!`);
+};
+
+window.fazerLogout = function() {
+  db.clearSession();
+  const viewLogin = document.getElementById('view-login');
+  const mainHeader = document.getElementById('main-header');
+  const mainContent = document.getElementById('main-content');
+  const mainFooter = document.getElementById('main-footer');
+
+  if (viewLogin) viewLogin.classList.remove('hidden');
+  if (mainHeader) mainHeader.classList.add('hidden');
+  if (mainContent) mainContent.classList.add('hidden');
+  if (mainFooter) mainFooter.classList.add('hidden');
+
+  window.showToast('Sessão encerrada.');
+};
+
+function iniciarSessaoUI(user) {
+  const viewLogin = document.getElementById('view-login');
+  const mainHeader = document.getElementById('main-header');
+  const mainContent = document.getElementById('main-content');
+  const mainFooter = document.getElementById('main-footer');
+
+  if (viewLogin) viewLogin.classList.add('hidden');
+  if (mainHeader) mainHeader.classList.remove('hidden');
+  if (mainContent) mainContent.classList.remove('hidden');
+  if (mainFooter) mainFooter.classList.remove('hidden');
+
+  const elBadge = document.getElementById('user-avatar-badge');
+  const elName = document.getElementById('user-display-name');
+  const elRole = document.getElementById('user-display-role');
+
+  if (elBadge) elBadge.textContent = user.badge || 'SEC';
+  if (elName) elName.textContent = user.name || 'Secretaria Central';
+  if (elRole) elRole.textContent = user.role || 'Operacional';
+
+  window.navegarPara('dashboard');
+}
+
+window.alternarTemaGlobal = function() {
+  const htmlEl = document.documentElement;
+  const isDark = htmlEl.classList.contains('dark');
+  const newTheme = isDark ? 'light' : 'dark';
+
+  if (newTheme === 'dark') {
+    htmlEl.classList.remove('light');
+    htmlEl.classList.add('dark');
+  } else {
+    htmlEl.classList.remove('dark');
+    htmlEl.classList.add('light');
+  }
+
+  db.setTheme(newTheme);
+  window.showToast(`Modo ${newTheme === 'dark' ? 'Escuro' : 'Claro'} ativado.`, 'light_mode');
+};
+
 window.navegarPara = function(viewId) {
   const spaViews = document.querySelectorAll('.spa-view');
   const navLinks = document.querySelectorAll('.nav-link');
@@ -811,7 +891,6 @@ window.enviarMensagemLawAI = function() {
 // INICIALIZAÇÃO EVENT LISTENERS AO CARREGAR DOM
 document.addEventListener('DOMContentLoaded', () => {
   const htmlEl = document.documentElement;
-  const btnThemeToggle = document.getElementById('btn-theme-toggle');
 
   function aplicarTema(theme) {
     if (theme === 'dark') {
@@ -826,14 +905,39 @@ document.addEventListener('DOMContentLoaded', () => {
 
   aplicarTema(db.getTheme());
 
-  if (btnThemeToggle) {
-    btnThemeToggle.addEventListener('click', () => {
-      const isDark = htmlEl.classList.contains('dark');
-      const newTheme = isDark ? 'light' : 'dark';
-      aplicarTema(newTheme);
-      window.showToast(`Modo ${newTheme === 'dark' ? 'Escuro' : 'Claro'} ativado.`, 'light_mode');
-    });
+  // Checa se usuário possui sessão ativa salva
+  const savedSession = db.getSession();
+  if (savedSession) {
+    iniciarSessaoUI(savedSession);
   }
+
+  // Formulário de Login
+  document.getElementById('form-login')?.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const email = document.getElementById('login-email').value.trim();
+
+    let user = {
+      id: 'user-1',
+      name: 'Secretaria Central',
+      role: 'Operacional • ETEC Bragança',
+      badge: 'SEC',
+      email: email
+    };
+
+    if (email.includes('carlos') || email.includes('advogado')) {
+      user = {
+        id: 'user-2',
+        name: 'Dr. Carlos Eduardo',
+        role: 'Sócio-Diretor • OAB/SP 123456',
+        badge: 'CE',
+        email: email
+      };
+    }
+
+    db.setSession(user);
+    iniciarSessaoUI(user);
+    window.showToast(`Autenticado com sucesso! Bem-vindo(a), ${user.name}`);
+  });
 
   document.getElementById('input-busca-cliente')?.addEventListener('input', renderClientes);
   document.getElementById('select-agenda-advogado')?.addEventListener('change', renderGradeHorarios);
@@ -928,6 +1032,4 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('lawai-input-msg')?.addEventListener('keypress', (e) => {
     if (e.key === 'Enter') window.enviarMensagemLawAI();
   });
-
-  renderDashboard();
 });

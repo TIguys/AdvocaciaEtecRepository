@@ -1,5 +1,5 @@
 /**
- * Advocacia ETEC - Camada de Dados e Persistência LocalStorage
+ * Advocacia ETEC - Camada de Dados e Persistência LocalStorage com Conexão Supabase
  */
 
 const STORAGE_KEYS = {
@@ -7,7 +7,8 @@ const STORAGE_KEYS = {
   ADVOGADOS: 'advocacia_etec_advogados',
   SERVICOS: 'advocacia_etec_servicos',
   CONSULTAS: 'advocacia_etec_consultas',
-  THEME: 'advocacia_etec_theme'
+  THEME: 'advocacia_etec_theme',
+  USER_SESSION: 'advocacia_etec_session'
 };
 
 const MULTIPLICADORES_SENIORIDADE = {
@@ -159,7 +160,6 @@ const SEED_CLIENTES = [
   }
 ];
 
-// Helper para formatar data local ISO YYYY-MM-DD
 function getFormattedDate(offsetDays = 0, hour = 10, minute = 0) {
   const d = new Date();
   d.setDate(d.getDate() + offsetDays);
@@ -175,7 +175,7 @@ const SEED_CONSULTAS = [
     advogadoId: 'adv-3',
     servicoId: 'srv-2',
     valorCausa: 50000.00,
-    valorHonorario: 8250.00, // max(1500, 15% de 50k = 7500) * 1.10 (Pleno) = 8250
+    valorHonorario: 8250.00,
     inicio: getFormattedDate(0, 14, 0),
     fim: getFormattedDate(0, 15, 0),
     modalidade: 'Presencial',
@@ -190,7 +190,7 @@ const SEED_CONSULTAS = [
     advogadoId: 'adv-2',
     servicoId: 'srv-4',
     valorCausa: 120000.00,
-    valorHonorario: 1120.00, // max(800, 0) * 1.40 (Especialista) = 1120
+    valorHonorario: 1120.00,
     inicio: getFormattedDate(0, 15, 30),
     fim: getFormattedDate(0, 16, 30),
     modalidade: 'Videoconferência',
@@ -205,7 +205,7 @@ const SEED_CONSULTAS = [
     advogadoId: 'adv-1',
     servicoId: 'srv-8',
     valorCausa: 200000.00,
-    valorHonorario: 12500.00, // max(3500, 5% de 200k = 10000) * 1.25 (Senior) = 12500
+    valorHonorario: 12500.00,
     inicio: getFormattedDate(0, 17, 0),
     fim: getFormattedDate(0, 18, 0),
     modalidade: 'Presencial',
@@ -220,7 +220,7 @@ const SEED_CONSULTAS = [
     advogadoId: 'adv-5',
     servicoId: 'srv-6',
     valorCausa: null,
-    valorHonorario: 2200.00, // max(2000, 0) * 1.10 (Pleno) = 2200
+    valorHonorario: 2200.00,
     inicio: getFormattedDate(1, 10, 0),
     fim: getFormattedDate(1, 11, 0),
     modalidade: 'Presencial',
@@ -235,7 +235,7 @@ const SEED_CONSULTAS = [
     advogadoId: 'adv-4',
     servicoId: 'srv-1',
     valorCausa: null,
-    valorHonorario: 300.00, // max(300, 0) * 1.00 (Junior) = 300
+    valorHonorario: 300.00,
     inicio: getFormattedDate(1, 14, 30),
     fim: getFormattedDate(1, 15, 30),
     modalidade: 'Videoconferência',
@@ -248,7 +248,19 @@ const SEED_CONSULTAS = [
 
 class Database {
   constructor() {
+    this.initSupabase();
     this.initStorage();
+  }
+
+  initSupabase() {
+    this.supabase = null;
+    if (typeof window !== 'undefined' && window.supabase && window.SUPABASE_URL && window.SUPABASE_ANON_KEY) {
+      try {
+        this.supabase = window.supabase.createClient(window.SUPABASE_URL, window.SUPABASE_ANON_KEY);
+      } catch (e) {
+        console.warn('Supabase não inicializado, usando LocalStorage fallback:', e);
+      }
+    }
   }
 
   isBrowser() {
@@ -287,6 +299,23 @@ class Database {
     }
   }
 
+  // === GERENCIAMENTO DE SESSÃO / USUÁRIO LOGADO ===
+  getSession() {
+    return this.getItem(STORAGE_KEYS.USER_SESSION) || null;
+  }
+
+  setSession(user) {
+    this.setItem(STORAGE_KEYS.USER_SESSION, user);
+  }
+
+  clearSession() {
+    if (this.isBrowser()) {
+      localStorage.removeItem(STORAGE_KEYS.USER_SESSION);
+    } else if (this.memoryStore) {
+      delete this.memoryStore[STORAGE_KEYS.USER_SESSION];
+    }
+  }
+
   // === CÁLCULO DE HONORÁRIOS OAB (F3) ===
   calcularHonorario(servicoId, valorCausa, advogadoId) {
     const servicos = this.getServicos();
@@ -316,7 +345,6 @@ class Database {
     const inicio = new Date(inicioIso);
     const fim = new Date(fimIso);
 
-    // Duração mínima 30 min
     const duracaoMinutos = (fim.getTime() - inicio.getTime()) / (1000 * 60);
     if (duracaoMinutos < 30) {
       return {
@@ -330,7 +358,6 @@ class Database {
       return { temConflito: true, mensagem: 'Advogado não encontrado.' };
     }
 
-    // Verificar horário de expediente
     const horaInicio = inicio.getHours() * 60 + inicio.getMinutes();
     const horaFim = fim.getHours() * 60 + fim.getMinutes();
 
@@ -354,7 +381,6 @@ class Database {
       };
     }
 
-    // Verificar sobreposição com consultas agendadas do mesmo advogado
     const consultas = this.getConsultas().filter(c =>
       c.advogadoId === advogadoId &&
       c.status !== 'cancelada' &&
@@ -412,7 +438,6 @@ class Database {
 
   salvarAdvogado(advogado) {
     const advogados = this.getAdvogados();
-    // Validar OAB única
     const oabExiste = advogados.some(a =>
       a.oab.trim().toLowerCase() === advogado.oab.trim().toLowerCase() &&
       a.id !== advogado.id
@@ -464,7 +489,6 @@ class Database {
       throw new Error(validacao.mensagem);
     }
 
-    // Calcula honorário automático
     consulta.valorHonorario = this.calcularHonorario(
       consulta.servicoId,
       consulta.valorCausa,
