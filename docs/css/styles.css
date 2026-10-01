@@ -1,0 +1,77 @@
+/* Custom Styles para Advocacia ETEC */
+
+/* Suporte suave para alternância de tema e rolagem */
+html {
+  scroll-behavior: smooth;
+  transition: background-color 0.25s ease, color 0.25s ease;
+}
+
+body {
+  font-family: 'IBM Plex Sans', 'Plus Jakarta Sans', sans-serif;
+}
+
+/* Tipografia Serif Editorial */
+.font-serif-title, .font-serif {
+  font-family: 'Noto Serif', 'PT Serif', Georgia, serif;
+}
+
+/* Scrollbar discreta */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(150, 150, 150, 0.3);
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(150, 150, 150, 0.5);
+}
+
+/* Estilos de Impressão Limpa (@media print) conforme F5 / SPEC.md */
+@media print {
+  /* Oculta navegação, botões de ação, barra de busca e modal na impressão */
+  header, nav, aside, .no-print, button, #btn-theme-toggle, .modal-overlay {
+    display: none !important;
+  }
+
+  body {
+    background-color: #ffffff !important;
+    color: #000000 !important;
+    font-size: 12pt;
+  }
+
+  main {
+    max-width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  /* Exibe cabeçalho institucional exclusivo para impressão */
+  .print-header {
+    display: flex !important;
+    justify-content: space-between;
+    align-items: center;
+    border-b: 2px solid #701A24;
+    padding-bottom: 12px;
+    margin-bottom: 24px;
+  }
+
+  .print-card {
+    border: 1px solid #cccccc !important;
+    box-shadow: none !important;
+    page-break-inside: avoid;
+  }
+
+  /* Garante cores de fundo ao imprimir tabelas/relatórios se suportado */
+  * {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+}
