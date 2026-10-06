@@ -940,41 +940,78 @@ window.enviarMensagemLawAI = function() {
   const msg = lawaiInput.value.trim();
   if (!msg) return;
 
-  lawaiChatBox.innerHTML += `
-    <div class="flex items-start justify-end gap-3">
-      <div class="bg-brand-800 text-white p-3 rounded-lg max-w-[80%] leading-relaxed">
-        ${msg}
-      </div>
+  const userMessage = document.createElement('div');
+  userMessage.className = 'flex items-start justify-end gap-3';
+  userMessage.innerHTML = `
+    <div class="bg-brand-800 text-white p-3 rounded-lg max-w-[80%] leading-relaxed whitespace-pre-wrap">
+      ${String(msg).replace(/</g, '&lt;').replace(/>/g, '&gt;')}
     </div>
   `;
+  lawaiChatBox.appendChild(userMessage);
 
   lawaiInput.value = '';
+  lawaiInput.disabled = true;
+  document.getElementById('lawai-btn-send')?.setAttribute('disabled', 'disabled');
+
+  const loading = document.createElement('div');
+  loading.className = 'flex items-start gap-3';
+  loading.innerHTML = `
+    <div class="w-8 h-8 rounded-full bg-brand-800 text-gold-400 font-bold flex items-center justify-center shrink-0">AI</div>
+    <div class="bg-stone-100 dark:bg-darkcard p-3 rounded-lg text-stone-800 dark:text-stone-200 max-w-[80%] leading-relaxed">
+      Pensando...
+    </div>
+  `;
+  lawaiChatBox.appendChild(loading);
   lawaiChatBox.scrollTop = lawaiChatBox.scrollHeight;
 
-  setTimeout(() => {
-    let resp = "Compreendido, doutor(a). Com base na legislação brasileira e jurisprudência dos Tribunais Superiores, recomendo verificar a adequação aos requisitos legais e prazos previstos no Código de Processo Civil / Penal.";
-    const msgLower = msg.toLowerCase();
+  fetch('http://127.0.0.1:8765/api/ai', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ message: msg })
+  })
+    .then(async (response) => {
+      const data = await response.json().catch(() => ({}));
+      if (!response.ok) {
+        throw new Error(data.error || 'Não foi possível responder neste momento.');
+      }
+      return data.answer || 'Não houve resposta da inteligência artificial.';
+    })
+    .then((answer) => {
+      loading.remove();
 
-    if (msgLower.includes('estelionato') || msgLower.includes('171')) {
-      resp = "<strong>Art. 171 do Código Penal (Estelionato):</strong> Obter, para si ou para outrem, vantagem ilícita, em prejuízo alheio, induzindo ou mantendo alguém em erro. <br/><strong>Pena:</strong> Reclusão, de 1 a 5 anos, e multa. Com o advento da Lei 13.964/19 (Pacote Anticrime), a ação penal tornou-se pública condicionada à representação, salvo exceções legais.";
-    } else if (msgLower.includes('divórcio') || msgLower.includes('família')) {
-      resp = "<strong>Direito de Família (Lei 11.441/07 & CPC):</strong> O divórcio consensual pode ser realizado por escritura pública em cartório se não houver filhos menores/incapazes e houver consenso na partilha de bens. Valor mínimo na tabela OAB: R$ 2.000,00.";
-    } else if (msgLower.includes('trabalhista') || msgLower.includes('rescisão')) {
-      resp = "<strong>Direito do Trabalho (CLT, art. 477):</strong> O pagamento das verbas rescisórias deve ser efetuado em até 10 dias após o término do contrato. Honorários de sucumbência variam entre 5% e 15% segundo a Reforma Trabalhista.";
-    }
+      const botMessage = document.createElement('div');
+      botMessage.className = 'flex items-start gap-3';
+      botMessage.innerHTML = `
+        <div class="w-8 h-8 rounded-full bg-brand-800 text-gold-400 font-bold flex items-center justify-center shrink-0">AI</div>
+        <div class="bg-stone-100 dark:bg-darkcard p-3 rounded-lg text-stone-800 dark:text-stone-200 max-w-[80%] leading-relaxed whitespace-pre-wrap">
+          ${String(answer || '').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/\n/g, '<br>')}
+        </div>
+      `;
+      lawaiChatBox.appendChild(botMessage);
+    })
+    .catch((error) => {
+      loading.remove();
 
-    lawaiChatBox.innerHTML += `
-      <div class="flex items-start gap-3">
-        <div class="w-8 h-8 rounded-full bg-brand-800 text-gold-400 font-bold flex items-center justify-center shrink-0">
-          AI
+      const errorText = error instanceof TypeError
+        ? 'Não foi possível conectar à IA. Confira se o Python está instalado, se o arquivo Ai_tcc.env está configurado e inicie o servidor pelo arquivo iniciar_ia.bat.'
+        : (error.message || 'Erro ao consultar a IA.');
+
+      const errorMessage = document.createElement('div');
+      errorMessage.className = 'flex items-start gap-3';
+      errorMessage.innerHTML = `
+        <div class="w-8 h-8 rounded-full bg-red-600 text-white font-bold flex items-center justify-center shrink-0">!</div>
+        <div class="bg-red-50 text-red-700 p-3 rounded-lg max-w-[80%] leading-relaxed">
+          ${String(errorText).replace(/</g, '&lt;').replace(/>/g, '&gt;')}
         </div>
-        <div class="bg-stone-100 dark:bg-darkcard p-3 rounded-lg text-stone-800 dark:text-stone-200 max-w-[80%] leading-relaxed">
-          ${resp}
-        </div>
-      </div>
-    `;
-    lawaiChatBox.scrollTop = lawaiChatBox.scrollHeight;
-  }, 600);
+      `;
+      lawaiChatBox.appendChild(errorMessage);
+    })
+    .finally(() => {
+      lawaiInput.disabled = false;
+      document.getElementById('lawai-btn-send')?.removeAttribute('disabled');
+      lawaiInput.focus();
+      lawaiChatBox.scrollTop = lawaiChatBox.scrollHeight;
+    });
 };
 
 // INICIALIZAÇÃO EVENT LISTENERS AO CARREGAR DOM
@@ -1001,66 +1038,67 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // Formulário de Login
-  document.getElementById('form-login')?.addEventListener('submit', (e) => {
-    e.preventDefault();
-    const email = document.getElementById('login-email').value.trim();
-
-    let user = {
-      id: 'user-1',
-      name: 'Secretaria Central',
-      role: 'Operacional • ETEC Bragança',
-      badge: 'SEC',
-      email: email
-    };
-
-    if (email.includes('carlos') || email.includes('advogado')) {
-      user = {
-        id: 'user-2',
-        name: 'Dr. Carlos Eduardo',
-        role: 'Sócio-Diretor • OAB/SP 123456',
-        badge: 'CE',
-        email: email
-      };
-    }
-
-    db.setSession(user);
-    iniciarSessaoUI(user);
-    window.showToast(`Autenticado com sucesso! Bem-vindo(a), ${user.name}`);
-  });
-
   document.getElementById('form-login')?.addEventListener('submit', async (e) => {
     e.preventDefault();
-    e.stopImmediatePropagation();
-    const email = document.getElementById('login-email').value.trim().toLowerCase();
-    const password = document.getElementById('login-senha').value;
-    const registered = db.getUsers().find(account => account.email === email);
-    const requestedRole = document.getElementById('login-role').value;
-    let user = null;
-    const storedRole = registered?.role === 'Usuário cadastrado' ? 'cliente' : (registered?.role || 'cliente');
-    if (registered && storedRole === requestedRole && await derivePasswordHash(password, registered.passwordSalt) === registered.passwordHash) {
-      const { passwordHash, passwordSalt, ...safeUser } = registered;
-      safeUser.role = storedRole;
-      user = safeUser;
-    } else if (!registered && requestedRole === 'secretaria' && password === '123456' && email === 'secretaria@advocaciaetec.com.br') {
-      user = { id: 'user-1', name: 'Secretaria Central', role: 'Operacional', badge: 'SEC', email };
-    } else if (!registered && requestedRole === 'advogado' && password === '123456' && email === 'carlos.eduardo@advocaciaetec.com.br') {
-      user = { id: 'user-2', name: 'Dr. Carlos Eduardo', role: 'Sócio-Diretor', badge: 'CE', email };
+
+    const email = document.getElementById('login-email')?.value.trim().toLowerCase();
+    const password = document.getElementById('login-senha')?.value || '';
+    const requestedRole = document.getElementById('login-role')?.value || 'cliente';
+
+    if (!email || !password) {
+      window.showToast('Informe e-mail e senha para continuar.', 'error', true);
+      return;
     }
+
+    const registered = db.getUsers().find(account => String(account.email || '').toLowerCase() === email);
+    let user = null;
+
+    if (registered) {
+      const storedRole = registered.role === 'Usuário cadastrado' ? 'cliente' : (registered.role || 'cliente');
+
+      if (storedRole !== requestedRole) {
+        window.showToast('Este usuário não corresponde ao perfil selecionado.', 'error', true);
+        return;
+      }
+
+      const hashedPassword = await derivePasswordHash(password, registered.passwordSalt || '');
+      if (hashedPassword !== registered.passwordHash) {
+        window.showToast('E-mail ou senha incorretos.', 'error', true);
+        return;
+      }
+
+      const { passwordHash, passwordSalt, ...safeUser } = registered;
+      user = { ...safeUser, role: storedRole, email };
+    } else if (requestedRole === 'secretaria' && password === '123456' && email === 'secretaria@advocaciaetec.com.br') {
+      user = { id: 'user-1', name: 'Secretaria Central', role: 'secretaria', badge: 'SEC', email };
+    } else if (requestedRole === 'advogado' && password === '123456' && email === 'carlos.eduardo@advocaciaetec.com.br') {
+      user = { id: 'user-2', name: 'Dr. Carlos Eduardo', role: 'advogado', badge: 'CE', email };
+    }
+
     if (!user) {
       window.showToast('E-mail ou senha incorretos.', 'error', true);
       return;
     }
+
     if (user.role === 'cliente') {
       let cliente = db.getClientes().find(c => String(c.email || '').toLowerCase() === email);
       if (!cliente) cliente = db.salvarCliente({ nomeCompleto: user.name, email, cpfCnpj: '', telefone: '', endereco: '' });
       user.clienteId = cliente.id;
     }
+
     db.setSession(user);
     iniciarSessaoUI(user);
-    if (user.role === 'cliente') window.navegarPara('area-cliente');
-    else if (user.role === 'advogado' || user.id === 'user-2') window.navegarPara('area-advogado');
+
+    if (user.role === 'cliente') {
+      window.navegarPara('area-cliente');
+    } else if (user.role === 'advogado' || user.id === 'user-2') {
+      window.navegarPara('area-advogado');
+    } else {
+      window.navegarPara('dashboard');
+    }
+
     window.showToast(`Bem-vindo(a), ${user.name}!`);
-  }, true);
+  });
 
   document.getElementById('form-register')?.addEventListener('submit', async (e) => {
     e.preventDefault();
@@ -1227,5 +1265,12 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('lawai-input-msg')?.addEventListener('keypress', (e) => {
     if (e.key === 'Enter') window.enviarMensagemLawAI();
   });
-});
+  // Quando o Supabase envia dados atualizados, re-renderiza a tela atual
+  document.addEventListener('db:synced', () => {
+    const visible = document.querySelector('.spa-view:not(.hidden)');
+    if (visible && typeof window.renderView === 'function') {
+      window.renderView(visible.id.replace('view-', ''));
+    }
+  });
 
+});

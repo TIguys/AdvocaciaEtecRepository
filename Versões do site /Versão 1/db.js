@@ -1,5 +1,15 @@
 /**
- * Advocacia ETEC - Camada de Dados e Persistência LocalStorage com Conexão Supabase
+ * Advocacia ETEC - Camada de Dados
+ * Persistência: LocalStorage (cache local) + sincronização Supabase (quando configurado)
+ *
+ * Como funciona a sincronização:
+ * - Ao carregar, o sistema puxa os dados do Supabase e atualiza o LocalStorage
+ *   (apenas quando o dado remoto é mais recente que o local).
+ * - Toda alteração (salvar cliente, agendar consulta etc.) continua gravando
+ *   instantaneamente no LocalStorage e, em seguida, é enviada ao Supabase
+ *   (com debounce de 400 ms para não sobrecarregar a rede).
+ * - Se o Supabase não estiver configurado ou estiver offline, o sistema segue
+ *   funcionando 100% com LocalStorage, como antes.
  */
 
 const STORAGE_KEYS = {
@@ -11,6 +21,9 @@ const STORAGE_KEYS = {
   USER_SESSION: 'advocacia_etec_session',
   USERS: 'advocacia_etec_users'
 };
+
+// Prefixo usado para guardar o "timestamp da última sincronização" de cada chave
+const SYNC_META_PREFIX = 'advocacia_etec_sync_';
 
 const MULTIPLICADORES_SENIORIDADE = {
   'Junior': 1.00,
@@ -249,18 +262,37 @@ const SEED_CONSULTAS = [
 
 class Database {
   constructor() {
+    this._pushTimers = {};
     this.initSupabase();
     this.initStorage();
+    // Puxa dados do Supabase em segundo plano (sem travar a interface)
+    this.pullFromSupabase();
   }
 
+  // === CONFIGURAÇÃO DO SUPABASE ===
   initSupabase() {
     this.supabase = null;
-    if (typeof window !== 'undefined' && window.supabase && window.SUPABASE_URL && window.SUPABASE_ANON_KEY) {
-      try {
-        this.supabase = window.supabase.createClient(window.SUPABASE_URL, window.SUPABASE_ANON_KEY);
-      } catch (e) {
-        console.warn('Supabase não inicializado, usando LocalStorage fallback:', e);
-      }
+    this.supabaseReady = false;
+
+    const url = (typeof window !== 'undefined' && window.SUPABASE_URL) || '';
+    const key = (typeof window !== 'undefined' && window.SUPABASE_ANON_KEY) || '';
+
+    if (!url || !key) {
+      // Supabase não configurado: segue 100% com LocalStorage (comportamento antigo)
+      return;
+    }
+
+    if (typeof window === 'undefined' || !window.supabase) {
+      console.warn('Variáveis do Supabase definidas, mas a biblioteca supabase-js não foi carregada.');
+      return;
+    }
+
+    try {
+      this.supabase = window.supabase.createClient(url, key);
+      this.supabaseReady = true;
+      console.log('[Supabase] Cliente conectado. Sincronização ativa.');
+    } catch (e) {
+      console.warn('Falha ao conectar no Supabase, usando LocalStorage:', e);
     }
   }
 
@@ -268,7 +300,8 @@ class Database {
     return typeof window !== 'undefined' && typeof window.localStorage !== 'undefined';
   }
 
-  getItem(key) {
+  // Leitura/gravação puramente local (sem disparar sincronização)
+  _readLocal(key) {
     if (this.isBrowser()) {
       const data = localStorage.getItem(key);
       return data ? JSON.parse(data) : null;
@@ -276,12 +309,79 @@ class Database {
     return this.memoryStore ? this.memoryStore[key] : null;
   }
 
-  setItem(key, value) {
+  _writeLocal(key, value) {
     if (this.isBrowser()) {
       localStorage.setItem(key, JSON.stringify(value));
     } else {
       if (!this.memoryStore) this.memoryStore = {};
       this.memoryStore[key] = value;
+    }
+  }
+
+  getItem(key) {
+    return this._readLocal(key);
+  }
+
+  setItem(key, value) {
+    this._writeLocal(key, value);
+    this._schedulePush(key, value);
+  }
+
+  // === SINCRONIZAÇÃO COM O SUPABASE ===
+  _getSyncMeta(key) {
+    return Number(this._readLocal(SYNC_META_PREFIX + key)) || 0;
+  }
+
+  _setSyncMeta(key, timestampMs) {
+    this._writeLocal(SYNC_META_PREFIX + key, timestampMs);
+  }
+
+  _schedulePush(key, value) {
+    if (!this.supabaseReady) return;
+    clearTimeout(this._pushTimers[key]);
+    this._pushTimers[key] = setTimeout(() => this._pushToSupabase(key, value), 400);
+  }
+
+  async _pushToSupabase(key, value) {
+    try {
+      const { error } = await this.supabase
+        .from('app_data')
+        .upsert(
+          { key: key, payload: value, updated_at: new Date().toISOString() },
+          { onConflict: 'key' }
+        );
+      if (error) throw error;
+      this._setSyncMeta(key, Date.now());
+    } catch (e) {
+      console.warn('Supabase: falha ao enviar "' + key + '". Os dados locais estão preservados.', e);
+    }
+  }
+
+  async pullFromSupabase() {
+    if (!this.supabaseReady) return;
+    try {
+      const { data, error } = await this.supabase
+        .from('app_data')
+        .select('key, payload, updated_at');
+      if (error) throw error;
+
+      let changed = false;
+      for (const row of data || []) {
+        if (!row || !row.key) continue;
+        const remoteMs = Date.parse(row.updated_at) || 0;
+        if (remoteMs > this._getSyncMeta(row.key)) {
+          this._writeLocal(row.key, row.payload);
+          this._setSyncMeta(row.key, remoteMs);
+          changed = true;
+        }
+      }
+
+      if (changed && typeof document !== 'undefined') {
+        // Avisa a interface para re-renderizar com os dados vindos do servidor
+        document.dispatchEvent(new CustomEvent('db:synced'));
+      }
+    } catch (e) {
+      console.warn('Supabase: falha ao baixar dados. Usando cópia local.', e);
     }
   }
 
@@ -297,6 +397,9 @@ class Database {
     }
     if (!this.getItem(STORAGE_KEYS.CONSULTAS)) {
       this.setItem(STORAGE_KEYS.CONSULTAS, SEED_CONSULTAS);
+    }
+    if (!this.getItem(STORAGE_KEYS.USERS)) {
+      this.setItem(STORAGE_KEYS.USERS, []);
     }
   }
 
@@ -585,4 +688,3 @@ if (typeof window !== 'undefined') {
 if (typeof module !== 'undefined') {
   module.exports = { Database, db };
 }
-
