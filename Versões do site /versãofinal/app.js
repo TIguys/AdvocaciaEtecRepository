@@ -992,12 +992,16 @@ window.enviarMensagemLawAI = function() {
     .catch((error) => {
       loading.remove();
 
+      const errorText = error instanceof TypeError
+        ? 'Não foi possível conectar à IA. Confira se o Python está instalado, se o arquivo Ai_tcc.env está configurado e inicie o servidor pelo arquivo iniciar_ia.bat.'
+        : (error.message || 'Erro ao consultar a IA.');
+
       const errorMessage = document.createElement('div');
       errorMessage.className = 'flex items-start gap-3';
       errorMessage.innerHTML = `
         <div class="w-8 h-8 rounded-full bg-red-600 text-white font-bold flex items-center justify-center shrink-0">!</div>
         <div class="bg-red-50 text-red-700 p-3 rounded-lg max-w-[80%] leading-relaxed">
-          ${String(error.message || 'Erro ao consultar a IA.').replace(/</g, '&lt;').replace(/>/g, '&gt;')}
+          ${String(errorText).replace(/</g, '&lt;').replace(/>/g, '&gt;')}
         </div>
       `;
       lawaiChatBox.appendChild(errorMessage);
@@ -1261,4 +1265,12 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('lawai-input-msg')?.addEventListener('keypress', (e) => {
     if (e.key === 'Enter') window.enviarMensagemLawAI();
   });
+  // Quando o Supabase envia dados atualizados, re-renderiza a tela atual
+  document.addEventListener('db:synced', () => {
+    const visible = document.querySelector('.spa-view:not(.hidden)');
+    if (visible && typeof window.renderView === 'function') {
+      window.renderView(visible.id.replace('view-', ''));
+    }
+  });
+
 });
