@@ -1,0 +1,746 @@
+<!DOCTYPE html>
+<html lang="pt-BR" class="dark">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"/>
+  <title>Para Sempre — Gustavo &amp; Dudinha</title>
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin=""/>
+  <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Montserrat:ital,wght@0,300;0,400;0,500;0,600;1,400&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+
+  <!-- Material Symbols Outlined -->
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200"/>
+
+  <!-- Tailwind CSS via CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Estilos Customizados -->
+  <link rel="stylesheet" href="style.css"/>
+
+  <!-- Supabase CDN (opcional se tiver credenciais) -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body class="selection:bg-rose-500/30 selection:text-white" data-theme="gustavo">
+
+  <!-- ==========================================
+       VIEW: LOGIN
+       ========================================== -->
+  <div id="view-login" class="min-h-screen flex items-center justify-center p-4 bg-[#051427] relative overflow-hidden">
+    <!-- Efeito de iluminação suave de fundo -->
+    <div class="absolute -top-32 -left-32 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl pointer-events-none"></div>
+    <div class="absolute -bottom-32 -right-32 w-96 h-96 bg-rose-500/10 rounded-full blur-3xl pointer-events-none"></div>
+
+    <div class="w-full max-w-md card-glass p-8 rounded-3xl relative z-10 border border-white/10 shadow-2xl">
+      <!-- Cabeçalho de Login -->
+      <div class="flex flex-col items-center text-center mb-8">
+        <div class="w-20 h-20 rounded-2xl overflow-hidden mb-4 shadow-lg border border-white/10 p-1 bg-black/20">
+          <img src="public/logo.png" alt="Para Sempre Logo" class="w-full h-full object-cover rounded-xl" onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1518199266791-5375a83190b7?w=200&auto=format&fit=crop&q=80';"/>
+        </div>
+        <h1 class="font-editorial text-3xl font-semibold tracking-tight text-white mb-1">Para Sempre</h1>
+        <p class="text-sm font-light text-slate-300">Um lugar só nosso.</p>
+      </div>
+
+      <!-- Formulário de Autenticação -->
+      <form id="login-form" class="space-y-5" onsubmit="event.preventDefault(); window.ParaSempreAuth.handleLogin();">
+        <div id="login-error" class="hidden p-3.5 rounded-xl bg-red-500/20 border border-red-500/40 text-red-200 text-xs text-center"></div>
+
+        <div>
+          <label for="login-username" class="block text-xs uppercase tracking-wider text-slate-400 mb-1.5 font-medium">Usuário</label>
+          <div class="relative">
+            <span class="material-symbols-outlined absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-lg">person</span>
+            <input id="login-username" type="text" autocomplete="username" required
+              class="w-full pl-11 pr-4 py-3 rounded-xl bg-slate-900/60 border border-slate-700/60 text-white placeholder-slate-500 focus:outline-none focus:border-blue-400 focus:ring-1 focus:ring-blue-400 text-sm transition-all"
+              placeholder="Seu usuário"/>
+          </div>
+        </div>
+
+        <div>
+          <label for="login-password" class="block text-xs uppercase tracking-wider text-slate-400 mb-1.5 font-medium">Senha</label>
+          <div class="relative">
+            <span class="material-symbols-outlined absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-lg">lock</span>
+            <input id="login-password" type="password" autocomplete="current-password" required
+              class="w-full pl-11 pr-11 py-3 rounded-xl bg-slate-900/60 border border-slate-700/60 text-white placeholder-slate-500 focus:outline-none focus:border-blue-400 focus:ring-1 focus:ring-blue-400 text-sm transition-all"
+              placeholder="Sua senha"/>
+            <button type="button" id="btn-toggle-pwd" class="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white" onclick="window.ParaSempreAuth.togglePasswordVisibility()">
+              <span class="material-symbols-outlined text-lg" id="pwd-icon">visibility</span>
+            </button>
+          </div>
+        </div>
+
+        <button type="submit" id="btn-login-submit"
+          class="w-full py-3.5 px-4 rounded-xl font-medium text-sm text-white shadow-lg transition-all duration-200 flex items-center justify-center gap-2 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 active:scale-[0.99]">
+          <span>Entrar</span>
+          <span class="material-symbols-outlined text-sm">arrow_forward</span>
+        </button>
+      </form>
+    </div>
+  </div>
+
+
+  <!-- ==========================================
+       VIEW: ÁREA PRIVADA (GUSTAVO OU DUDINHA)
+       ========================================== -->
+  <div id="view-app" class="hidden min-h-screen flex flex-col">
+
+    <!-- Header Fixo Superior -->
+    <header class="sticky top-0 z-40 w-full backdrop-blur-xl border-b border-white/10 px-4 md:px-8 py-3.5 flex items-center justify-between transition-colors">
+      <div class="flex items-center gap-3">
+        <button id="btn-open-sidebar" class="w-10 h-10 rounded-xl flex items-center justify-center text-slate-300 hover:text-white hover:bg-white/10 transition-colors" title="Abrir Menu">
+          <span class="material-symbols-outlined text-2xl">menu</span>
+        </button>
+        <div class="flex items-center gap-3">
+          <img src="public/logo.png" alt="Logo" class="w-8 h-8 rounded-lg object-cover border border-white/20"/>
+          <div>
+            <div class="font-editorial text-lg font-semibold tracking-wide" id="header-user-title">Para Sempre</div>
+            <div class="text-[11px] text-slate-400 tracking-wider" id="header-user-subtitle">Nosso cantinho, nossas histórias.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-3">
+        <div class="hidden sm:flex items-center gap-2 text-xs px-3 py-1.5 rounded-full border border-white/15 bg-white/5" id="user-pill">
+          <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+          <span id="user-display-name">Gustavo</span>
+        </div>
+        <button onclick="window.ParaSempreAuth.logout()" class="px-3.5 py-1.5 rounded-xl text-xs font-medium bg-red-500/20 text-red-200 hover:bg-red-500/30 border border-red-500/30 flex items-center gap-1.5 transition-all">
+          <span class="material-symbols-outlined text-base">logout</span>
+          <span>Sair</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- Overlay & Sidebar Retrátil -->
+    <div id="sidebar-backdrop" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden transition-opacity"></div>
+    <aside id="sidebar-drawer" class="fixed top-0 left-0 bottom-0 w-72 max-w-[85vw] bg-slate-950/95 backdrop-blur-2xl border-r border-white/10 z-50 flex flex-col justify-between -translate-x-full transition-transform duration-300 ease-in-out">
+      <div>
+        <!-- Cabeçalho do Drawer -->
+        <div class="h-16 px-5 flex items-center justify-between border-b border-white/10">
+          <div class="flex items-center gap-2">
+            <span class="material-symbols-outlined text-rose-400">favorite</span>
+            <span class="font-editorial text-base text-white">Nossa Galáxia</span>
+          </div>
+          <button id="btn-close-sidebar" class="w-9 h-9 rounded-full flex items-center justify-center text-slate-400 hover:text-white hover:bg-white/10">
+            <span class="material-symbols-outlined text-xl">close</span>
+          </button>
+        </div>
+
+        <!-- Links de Navegação -->
+        <nav class="p-3 space-y-1 text-sm overflow-y-auto max-h-[calc(100vh-140px)]" id="nav-links">
+          <a href="#dashboard" class="nav-item flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-white/10 transition-colors">
+            <span class="material-symbols-outlined text-lg">home</span>
+            <span>Início</span>
+          </a>
+          <a href="#playlist" class="nav-item flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-white/10 transition-colors">
+            <span class="material-symbols-outlined text-lg">queue_music</span>
+            <span>Nossa Playlist</span>
+          </a>
+          <a href="#bandas" class="nav-item flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-white/10 transition-colors">
+            <span class="material-symbols-outlined text-lg">album</span>
+            <span>Nossas Bandas</span>
+          </a>
+          <a href="#fotos" class="nav-item flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-white/10 transition-colors">
+            <span class="material-symbols-outlined text-lg">photo_library</span>
+            <span>Nossas Fotografias</span>
+          </a>
+          <a href="#notas" class="nav-item flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-white/10 transition-colors">
+            <span class="material-symbols-outlined text-lg">edit_note</span>
+            <span>Nossas Notas</span>
+          </a>
+          <a href="#cartinhas" class="nav-item flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-white/10 transition-colors">
+            <span class="material-symbols-outlined text-lg">mail</span>
+            <span>Cartinhas</span>
+          </a>
+          <a href="#animes" class="nav-item flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-white/10 transition-colors">
+            <span class="material-symbols-outlined text-lg">auto_awesome</span>
+            <span>Animes</span>
+          </a>
+          <a href="#filmes" class="nav-item flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-white/10 transition-colors">
+            <span class="material-symbols-outlined text-lg">movie</span>
+            <span>Filmes</span>
+          </a>
+          <a href="#palavras" class="nav-item flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-white/10 transition-colors">
+            <span class="material-symbols-outlined text-lg">format_quote</span>
+            <span>Palavras que Ficam</span>
+          </a>
+          <a href="#lugares" class="nav-item flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-white/10 transition-colors">
+            <span class="material-symbols-outlined text-lg">explore</span>
+            <span>Mapa de Sonhos</span>
+          </a>
+        </nav>
+      </div>
+
+      <div class="p-4 border-t border-white/10">
+        <button onclick="window.ParaSempreAuth.logout()" class="w-full py-2.5 px-3 rounded-xl text-xs font-medium bg-red-500/20 text-red-200 hover:bg-red-500/30 flex items-center justify-center gap-2">
+          <span class="material-symbols-outlined text-sm">logout</span>
+          <span>Encerrar Sessão</span>
+        </button>
+      </div>
+    </aside>
+
+    <!-- Conteúdo Principal Dinâmico -->
+    <main class="flex-1 w-full max-w-6xl mx-auto px-4 md:px-8 py-8">
+
+      <!-- Seção: Dashboard / Início -->
+      <section id="section-dashboard" class="space-y-10 fade-in">
+        <div class="text-center max-w-2xl mx-auto space-y-3 pt-4">
+          <span class="material-symbols-outlined text-3xl animate-bounce" id="dashboard-heart-icon">favorite</span>
+          <h2 class="font-editorial text-3xl md:text-5xl font-semibold tracking-tight text-white" id="dashboard-welcome-title">Bem-vindo, Darling</h2>
+          <p class="text-sm md:text-base text-slate-300 font-light" id="dashboard-welcome-quote">
+            "Cada momento com você é uma lembrança que quero guardar para sempre."
+          </p>
+        </div>
+
+        <!-- Grade de Acesso Rápido para todas as funcionalidades -->
+        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6 pt-4">
+          <a href="#playlist" class="card-glass p-5 rounded-2xl flex flex-col items-center text-center group transition-all">
+            <div class="w-12 h-12 rounded-xl bg-blue-500/20 text-blue-300 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
+              <span class="material-symbols-outlined text-2xl">queue_music</span>
+            </div>
+            <div class="font-editorial font-medium text-white mb-1">Nossa Playlist</div>
+            <div class="text-xs text-slate-400">Músicas que marcam nossa história</div>
+          </a>
+
+          <a href="#bandas" class="card-glass p-5 rounded-2xl flex flex-col items-center text-center group transition-all">
+            <div class="w-12 h-12 rounded-xl bg-indigo-500/20 text-indigo-300 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
+              <span class="material-symbols-outlined text-2xl">album</span>
+            </div>
+            <div class="font-editorial font-medium text-white mb-1">Nossas Bandas</div>
+            <div class="text-xs text-slate-400">Artistas e sons favoritos</div>
+          </a>
+
+          <a href="#fotos" class="card-glass p-5 rounded-2xl flex flex-col items-center text-center group transition-all">
+            <div class="w-12 h-12 rounded-xl bg-pink-500/20 text-pink-300 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
+              <span class="material-symbols-outlined text-2xl">photo_library</span>
+            </div>
+            <div class="font-editorial font-medium text-white mb-1">Fotografias</div>
+            <div class="text-xs text-slate-400">Momentos eternizados</div>
+          </a>
+
+          <a href="#notas" class="card-glass p-5 rounded-2xl flex flex-col items-center text-center group transition-all">
+            <div class="w-12 h-12 rounded-xl bg-amber-500/20 text-amber-300 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
+              <span class="material-symbols-outlined text-2xl">edit_note</span>
+            </div>
+            <div class="font-editorial font-medium text-white mb-1">Nossas Notas</div>
+            <div class="text-xs text-slate-400">Pequenas lembranças e notas</div>
+          </a>
+
+          <a href="#cartinhas" class="card-glass p-5 rounded-2xl flex flex-col items-center text-center group transition-all">
+            <div class="w-12 h-12 rounded-xl bg-rose-500/20 text-rose-300 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
+              <span class="material-symbols-outlined text-2xl">mail</span>
+            </div>
+            <div class="font-editorial font-medium text-white mb-1">Cartinhas</div>
+            <div class="text-xs text-slate-400">Mensagens escritas de coração</div>
+          </a>
+
+          <a href="#animes" class="card-glass p-5 rounded-2xl flex flex-col items-center text-center group transition-all">
+            <div class="w-12 h-12 rounded-xl bg-purple-500/20 text-purple-300 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
+              <span class="material-symbols-outlined text-2xl">auto_awesome</span>
+            </div>
+            <div class="font-editorial font-medium text-white mb-1">Animes</div>
+            <div class="text-xs text-slate-400">Maratonas planejadas e vistas</div>
+          </a>
+
+          <a href="#filmes" class="card-glass p-5 rounded-2xl flex flex-col items-center text-center group transition-all">
+            <div class="w-12 h-12 rounded-xl bg-emerald-500/20 text-emerald-300 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
+              <span class="material-symbols-outlined text-2xl">movie</span>
+            </div>
+            <div class="font-editorial font-medium text-white mb-1">Filmes</div>
+            <div class="text-xs text-slate-400">Pipoca e cinema a dois</div>
+          </a>
+
+          <a href="#palavras" class="card-glass p-5 rounded-2xl flex flex-col items-center text-center group transition-all">
+            <div class="w-12 h-12 rounded-xl bg-red-500/20 text-red-300 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
+              <span class="material-symbols-outlined text-2xl">format_quote</span>
+            </div>
+            <div class="font-editorial font-medium text-white mb-1">Palavras que Ficam</div>
+            <div class="text-xs text-slate-400">Frases inesquecíveis</div>
+          </a>
+
+          <a href="#lugares" class="card-glass p-5 rounded-2xl flex flex-col items-center text-center group transition-all sm:col-span-2 lg:col-span-4">
+            <div class="w-12 h-12 rounded-xl bg-teal-500/20 text-teal-300 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
+              <span class="material-symbols-outlined text-2xl">explore</span>
+            </div>
+            <div class="font-editorial font-medium text-white mb-1">Nosso Mapa de Sonhos</div>
+            <div class="text-xs text-slate-400">Destinos pelo mundo que queremos conhecer juntos</div>
+          </a>
+        </div>
+      </section>
+
+      <!-- Seção: Playlist Compartilhada -->
+      <section id="section-playlist" class="hidden space-y-8 fade-in">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div>
+            <h2 class="font-editorial text-3xl font-semibold text-white">Nossa Playlist</h2>
+            <p class="text-xs text-slate-400">Músicas compartilhadas em tempo real com player embutido.</p>
+          </div>
+          <button onclick="window.ParaSempreApp.openModal('modal-add-track')" class="px-4 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-medium flex items-center gap-2 self-start shadow-lg">
+            <span class="material-symbols-outlined text-base">add</span>
+            <span>Adicionar Música</span>
+          </button>
+        </div>
+
+        <!-- Player Ativo Embutido -->
+        <div class="card-glass p-5 rounded-2xl border border-white/15 flex flex-col md:flex-row items-center gap-5">
+          <div class="w-full md:w-80 aspect-video rounded-xl overflow-hidden bg-black/60 shadow-inner shrink-0">
+            <iframe id="youtube-main-player" class="w-full h-full" src="https://www.youtube.com/embed/pqrUQrAcfo4?enablejsapi=1" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+          </div>
+          <div class="flex-1 w-full space-y-2">
+            <div class="flex items-center gap-2 text-xs text-blue-400">
+              <span class="material-symbols-outlined text-sm">graphic_eq</span>
+              <span>Tocando Agora no Player Embutido</span>
+            </div>
+            <h3 class="font-editorial text-xl font-medium text-white truncate" id="player-active-title">Musica 01</h3>
+            <p class="text-xs text-slate-400">A reprodução ocorre diretamente nesta página sem abrir o YouTube em abas externas.</p>
+          </div>
+        </div>
+
+        <!-- Grade de Músicas -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4" id="tracks-container">
+          <!-- Injetado dinamicamente -->
+        </div>
+      </section>
+
+      <!-- Seção: Bandas e Artistas Compartilhados -->
+      <section id="section-bandas" class="hidden space-y-8 fade-in">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div>
+            <h2 class="font-editorial text-3xl font-semibold text-white">Nossas Bandas</h2>
+            <p class="text-xs text-slate-400">Nossos artistas favoritos com acesso direto ao Spotify.</p>
+          </div>
+          <button onclick="window.ParaSempreApp.openModal('modal-add-artist')" class="px-4 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-medium flex items-center gap-2 self-start shadow-lg">
+            <span class="material-symbols-outlined text-base">add</span>
+            <span>Adicionar Artista</span>
+          </button>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6" id="artists-container">
+          <!-- Injetado dinamicamente -->
+        </div>
+      </section>
+
+      <!-- Seção: Fotografias (Privada do Usuário) -->
+      <section id="section-fotos" class="hidden space-y-8 fade-in">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div>
+            <h2 class="font-editorial text-3xl font-semibold text-white">Nossas Fotografias</h2>
+            <p class="text-xs text-slate-400">Coleção pessoal de momentos eternizados com data e legenda.</p>
+          </div>
+          <button onclick="window.ParaSempreApp.openModal('modal-add-photo')" class="px-4 py-2.5 rounded-xl bg-pink-600 hover:bg-pink-500 text-white text-xs font-medium flex items-center gap-2 self-start shadow-lg">
+            <span class="material-symbols-outlined text-base">add_photo_alternate</span>
+            <span>Guardar Nova Foto</span>
+          </button>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6" id="photos-container">
+          <!-- Injetado dinamicamente -->
+        </div>
+      </section>
+
+      <!-- Seção: Notas (Privada do Usuário) -->
+      <section id="section-notas" class="hidden space-y-8 fade-in">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div>
+            <h2 class="font-editorial text-3xl font-semibold text-white">Nossas Notas</h2>
+            <p class="text-xs text-slate-400">Pensamentos, lembretes e pequenos acontecimentos.</p>
+          </div>
+          <button onclick="window.ParaSempreApp.openModal('modal-add-note')" class="px-4 py-2.5 rounded-xl bg-amber-600 hover:bg-amber-500 text-white text-xs font-medium flex items-center gap-2 self-start shadow-lg">
+            <span class="material-symbols-outlined text-base">edit</span>
+            <span>Nova Nota</span>
+          </button>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6" id="notes-container">
+          <!-- Injetado dinamicamente -->
+        </div>
+      </section>
+
+      <!-- Seção: Cartinhas (Privada do Usuário) -->
+      <section id="section-cartinhas" class="hidden space-y-8 fade-in">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div>
+            <h2 class="font-editorial text-3xl font-semibold text-white">Cartinhas</h2>
+            <p class="text-xs text-slate-400">Declarações e cartas especiais com visual e textura de papel.</p>
+          </div>
+          <button onclick="window.ParaSempreApp.openModal('modal-add-letter')" class="px-4 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-500 text-white text-xs font-medium flex items-center gap-2 self-start shadow-lg">
+            <span class="material-symbols-outlined text-base">history_edu</span>
+            <span>Escrever Cartinha</span>
+          </button>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6" id="letters-container">
+          <!-- Injetado dinamicamente -->
+        </div>
+      </section>
+
+      <!-- Seção: Animes (Privada do Usuário) -->
+      <section id="section-animes" class="hidden space-y-8 fade-in">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div>
+            <h2 class="font-editorial text-3xl font-semibold text-white">Animes</h2>
+            <p class="text-xs text-slate-400">Lista individual de animes desejados ou já assistidos.</p>
+          </div>
+          <button onclick="window.ParaSempreApp.openModal('modal-add-anime')" class="px-4 py-2.5 rounded-xl bg-purple-600 hover:bg-purple-500 text-white text-xs font-medium flex items-center gap-2 self-start shadow-lg">
+            <span class="material-symbols-outlined text-base">add</span>
+            <span>Cadastrar Anime</span>
+          </button>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6" id="animes-container">
+          <!-- Injetado dinamicamente -->
+        </div>
+      </section>
+
+      <!-- Seção: Filmes (Privada do Usuário) -->
+      <section id="section-filmes" class="hidden space-y-8 fade-in">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div>
+            <h2 class="font-editorial text-3xl font-semibold text-white">Filmes</h2>
+            <p class="text-xs text-slate-400">Catálogo em estilo de streaming para nossos filmes.</p>
+          </div>
+          <button onclick="window.ParaSempreApp.openModal('modal-add-movie')" class="px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-medium flex items-center gap-2 self-start shadow-lg">
+            <span class="material-symbols-outlined text-base">add</span>
+            <span>Cadastrar Filme</span>
+          </button>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6" id="movies-container">
+          <!-- Injetado dinamicamente -->
+        </div>
+      </section>
+
+      <!-- Seção: Palavras que Ficam (Privada do Usuário) -->
+      <section id="section-palavras" class="hidden space-y-8 fade-in">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div>
+            <h2 class="font-editorial text-3xl font-semibold text-white">Palavras que Ficam</h2>
+            <p class="text-xs text-slate-400">Frases e declarações eternizadas na memória.</p>
+          </div>
+          <button onclick="window.ParaSempreApp.openModal('modal-add-word')" class="px-4 py-2.5 rounded-xl bg-red-600 hover:bg-red-500 text-white text-xs font-medium flex items-center gap-2 self-start shadow-lg">
+            <span class="material-symbols-outlined text-base">add</span>
+            <span>Nova Frase</span>
+          </button>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6" id="words-container">
+          <!-- Injetado dinamicamente -->
+        </div>
+      </section>
+
+      <!-- Seção: Mapa de Sonhos (Compartilhado) -->
+      <section id="section-lugares" class="hidden space-y-8 fade-in">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div>
+            <h2 class="font-editorial text-3xl font-semibold text-white">Nosso Mapa de Sonhos</h2>
+            <p class="text-xs text-slate-400">Destinos pelo mundo que queremos visitar ou já conhecemos juntos.</p>
+          </div>
+          <button onclick="window.ParaSempreApp.openModal('modal-add-place')" class="px-4 py-2.5 rounded-xl bg-teal-600 hover:bg-teal-500 text-white text-xs font-medium flex items-center gap-2 self-start shadow-lg">
+            <span class="material-symbols-outlined text-base">add_location_alt</span>
+            <span>Adicionar Destino</span>
+          </button>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6" id="places-container">
+          <!-- Injetado dinamicamente -->
+        </div>
+      </section>
+
+      <!-- Seção Especial de Encerramento (Dedicatória Final na página) -->
+      <div id="final-message-container" class="mt-20 pt-10 pb-8 text-center rounded-3xl border border-white/10 p-8 card-glass relative overflow-hidden">
+        <div class="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent pointer-events-none"></div>
+        <div class="relative z-10 space-y-3">
+          <span class="material-symbols-outlined text-3xl text-rose-400 animate-pulse">favorite</span>
+          <h3 class="font-editorial text-3xl md:text-4xl font-semibold text-white" id="final-love-title">Te amo, Dudinha.</h3>
+          <p class="font-light text-slate-300 text-sm md:text-base max-w-lg mx-auto" id="final-love-subtitle">
+            Você faz parte das minhas melhores histórias.
+          </p>
+        </div>
+      </div>
+
+    </main>
+  </div>
+
+
+  <!-- ==========================================
+       MODAIS PARA ADIÇÃO E VISUALIZAÇÃO
+       ========================================== -->
+
+  <!-- Modal: Adicionar Música -->
+  <div id="modal-add-track" class="modal-overlay fixed inset-0 z-50 hidden flex items-center justify-center p-4">
+    <div class="w-full max-w-md card-glass p-6 rounded-3xl border border-white/10 space-y-4">
+      <div class="flex items-center justify-between">
+        <h3 class="font-editorial text-lg text-white font-medium">Adicionar Música à Playlist</h3>
+        <button onclick="window.ParaSempreApp.closeModal('modal-add-track')" class="text-slate-400 hover:text-white">
+          <span class="material-symbols-outlined">close</span>
+        </button>
+      </div>
+      <form onsubmit="window.ParaSempreApp.handleSubmitTrack(event)" class="space-y-4">
+        <div>
+          <label class="block text-xs uppercase text-slate-400 mb-1">Título da Música</label>
+          <input type="text" id="track-title" placeholder="Ex: Softcore" class="w-full px-3.5 py-2.5 rounded-xl bg-slate-900 border border-slate-700 text-white text-sm focus:outline-none focus:border-blue-400" required/>
+        </div>
+        <div>
+          <label class="block text-xs uppercase text-slate-400 mb-1">Link do YouTube</label>
+          <input type="url" id="track-url" placeholder="https://youtu.be/... ou https://youtube.com/watch?v=..." class="w-full px-3.5 py-2.5 rounded-xl bg-slate-900 border border-slate-700 text-white text-sm focus:outline-none focus:border-blue-400" required/>
+        </div>
+        <button type="submit" class="w-full py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-sm font-medium">Adicionar à Playlist</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal: Adicionar Artista -->
+  <div id="modal-add-artist" class="modal-overlay fixed inset-0 z-50 hidden flex items-center justify-center p-4">
+    <div class="w-full max-w-md card-glass p-6 rounded-3xl border border-white/10 space-y-4">
+      <div class="flex items-center justify-between">
+        <h3 class="font-editorial text-lg text-white font-medium">Adicionar Banda ou Artista</h3>
+        <button onclick="window.ParaSempreApp.closeModal('modal-add-artist')" class="text-slate-400 hover:text-white">
+          <span class="material-symbols-outlined">close</span>
+        </button>
+      </div>
+      <form onsubmit="window.ParaSempreApp.handleSubmitArtist(event)" class="space-y-4">
+        <div>
+          <label class="block text-xs uppercase text-slate-400 mb-1">Nome do Artista</label>
+          <input type="text" id="artist-name" placeholder="Ex: Arctic Monkeys" class="w-full px-3.5 py-2.5 rounded-xl bg-slate-900 border border-slate-700 text-white text-sm focus:outline-none focus:border-indigo-400" required/>
+        </div>
+        <div>
+          <label class="block text-xs uppercase text-slate-400 mb-1">URL da Imagem / Foto</label>
+          <input type="url" id="artist-image" placeholder="https://..." class="w-full px-3.5 py-2.5 rounded-xl bg-slate-900 border border-slate-700 text-white text-sm focus:outline-none focus:border-indigo-400"/>
+        </div>
+        <div>
+          <label class="block text-xs uppercase text-slate-400 mb-1">Link do Spotify (Opcional)</label>
+          <input type="url" id="artist-spotify" placeholder="Deixe em branco para busca automática no Spotify" class="w-full px-3.5 py-2.5 rounded-xl bg-slate-900 border border-slate-700 text-white text-sm focus:outline-none focus:border-indigo-400"/>
+        </div>
+        <button type="submit" class="w-full py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-medium">Adicionar Artista</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal: Adicionar Foto -->
+  <div id="modal-add-photo" class="modal-overlay fixed inset-0 z-50 hidden flex items-center justify-center p-4">
+    <div class="w-full max-w-md card-glass p-6 rounded-3xl border border-white/10 space-y-4">
+      <div class="flex items-center justify-between">
+        <h3 class="font-editorial text-lg text-white font-medium">Guardar Nova Fotografia</h3>
+        <button onclick="window.ParaSempreApp.closeModal('modal-add-photo')" class="text-slate-400 hover:text-white">
+          <span class="material-symbols-outlined">close</span>
+        </button>
+      </div>
+      <form onsubmit="window.ParaSempreApp.handleSubmitPhoto(event)" class="space-y-4">
+        <div>
+          <label class="block text-xs uppercase text-slate-400 mb-1">Escolher Imagem (Arquivo ou URL)</label>
+          <input type="file" id="photo-file" accept="image/*" class="w-full text-xs text-slate-400 file:mr-3 file:py-2 file:px-3 file:rounded-lg file:border-0 file:bg-pink-600 file:text-white file:text-xs mb-2"/>
+          <input type="url" id="photo-url" placeholder="Ou cole a URL da imagem diretamente" class="w-full px-3.5 py-2.5 rounded-xl bg-slate-900 border border-slate-700 text-white text-sm focus:outline-none focus:border-pink-400"/>
+        </div>
+        <div>
+          <label class="block text-xs uppercase text-slate-400 mb-1">Legenda Especial</label>
+          <input type="text" id="photo-caption" placeholder="Ex: Nosso dia inesquecível..." class="w-full px-3.5 py-2.5 rounded-xl bg-slate-900 border border-slate-700 text-white text-sm focus:outline-none focus:border-pink-400"/>
+        </div>
+        <button type="submit" class="w-full py-2.5 rounded-xl bg-pink-600 hover:bg-pink-500 text-white text-sm font-medium">Salvar Fotografia</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal: Lightbox de Foto Ampliada -->
+  <div id="modal-lightbox" class="modal-overlay fixed inset-0 z-50 hidden flex items-center justify-center p-4" onclick="window.ParaSempreApp.closeModal('modal-lightbox')">
+    <div class="max-w-3xl w-full flex flex-col items-center" onclick="event.stopPropagation()">
+      <div class="relative w-full rounded-2xl overflow-hidden shadow-2xl bg-black">
+        <img id="lightbox-img" src="" alt="Foto Ampliada" class="w-full max-h-[75vh] object-contain"/>
+        <button onclick="window.ParaSempreApp.closeModal('modal-lightbox')" class="absolute top-4 right-4 w-9 h-9 rounded-full bg-black/60 text-white flex items-center justify-center hover:bg-black/80">
+          <span class="material-symbols-outlined text-lg">close</span>
+        </button>
+      </div>
+      <p id="lightbox-caption" class="text-center text-sm text-slate-200 mt-3 font-light"></p>
+    </div>
+  </div>
+
+  <!-- Modal: Adicionar Nota -->
+  <div id="modal-add-note" class="modal-overlay fixed inset-0 z-50 hidden flex items-center justify-center p-4">
+    <div class="w-full max-w-md card-glass p-6 rounded-3xl border border-white/10 space-y-4">
+      <div class="flex items-center justify-between">
+        <h3 class="font-editorial text-lg text-white font-medium">Nova Nota</h3>
+        <button onclick="window.ParaSempreApp.closeModal('modal-add-note')" class="text-slate-400 hover:text-white">
+          <span class="material-symbols-outlined">close</span>
+        </button>
+      </div>
+      <form onsubmit="window.ParaSempreApp.handleSubmitNote(event)" class="space-y-4">
+        <div>
+          <label class="block text-xs uppercase text-slate-400 mb-1">Título</label>
+          <input type="text" id="note-title" placeholder="Título da nota" class="w-full px-3.5 py-2.5 rounded-xl bg-slate-900 border border-slate-700 text-white text-sm focus:outline-none focus:border-amber-400" required/>
+        </div>
+        <div>
+          <label class="block text-xs uppercase text-slate-400 mb-1">Conteúdo</label>
+          <textarea id="note-content" rows="4" placeholder="Escreva o que você está pensando..." class="w-full px-3.5 py-2.5 rounded-xl bg-slate-900 border border-slate-700 text-white text-sm focus:outline-none focus:border-amber-400" required></textarea>
+        </div>
+        <button type="submit" class="w-full py-2.5 rounded-xl bg-amber-600 hover:bg-amber-500 text-white text-sm font-medium">Salvar Nota</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal: Escrever Cartinha -->
+  <div id="modal-add-letter" class="modal-overlay fixed inset-0 z-50 hidden flex items-center justify-center p-4">
+    <div class="w-full max-w-lg card-glass p-6 rounded-3xl border border-white/10 space-y-4">
+      <div class="flex items-center justify-between">
+        <h3 class="font-editorial text-lg text-white font-medium">Escrever Cartinha</h3>
+        <button onclick="window.ParaSempreApp.closeModal('modal-add-letter')" class="text-slate-400 hover:text-white">
+          <span class="material-symbols-outlined">close</span>
+        </button>
+      </div>
+      <form onsubmit="window.ParaSempreApp.handleSubmitLetter(event)" class="space-y-4">
+        <div>
+          <label class="block text-xs uppercase text-slate-400 mb-1">Título / Para Quem</label>
+          <input type="text" id="letter-title" placeholder="Ex: Para o meu amor..." class="w-full px-3.5 py-2.5 rounded-xl bg-slate-900 border border-slate-700 text-white text-sm focus:outline-none focus:border-rose-400" required/>
+        </div>
+        <div>
+          <label class="block text-xs uppercase text-slate-400 mb-1">Mensagem Especial</label>
+          <textarea id="letter-content" rows="6" placeholder="Escreva sua cartinha com todo carinho..." class="w-full px-3.5 py-2.5 rounded-xl bg-slate-900 border border-slate-700 text-white text-sm focus:outline-none focus:border-rose-400" required></textarea>
+        </div>
+        <button type="submit" class="w-full py-2.5 rounded-xl bg-rose-600 hover:bg-rose-500 text-white text-sm font-medium">Guardar Cartinha</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal: Abrir Cartinha (Visual de Papel) -->
+  <div id="modal-view-letter" class="modal-overlay fixed inset-0 z-50 hidden flex items-center justify-center p-4" onclick="window.ParaSempreApp.closeModal('modal-view-letter')">
+    <div class="w-full max-w-lg letter-paper p-8 rounded-2xl relative shadow-2xl transition-all transform scale-100" onclick="event.stopPropagation()">
+      <button onclick="window.ParaSempreApp.closeModal('modal-view-letter')" class="absolute top-4 right-4 text-stone-500 hover:text-stone-900">
+        <span class="material-symbols-outlined">close</span>
+      </button>
+      <div class="text-center mb-6">
+        <span class="material-symbols-outlined text-rose-500 text-2xl">favorite</span>
+        <h4 id="letter-modal-title" class="font-editorial text-2xl font-semibold text-stone-900 mt-1">Título da Cartinha</h4>
+        <p id="letter-modal-date" class="text-xs text-stone-500 mt-0.5"></p>
+      </div>
+      <div id="letter-modal-content" class="text-stone-800 text-sm whitespace-pre-line font-light"></div>
+      <div class="mt-8 pt-4 border-t border-stone-300 text-right">
+        <span class="font-romantic text-2xl text-rose-600" id="letter-modal-sig">Com todo amor</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: Adicionar Anime -->
+  <div id="modal-add-anime" class="modal-overlay fixed inset-0 z-50 hidden flex items-center justify-center p-4">
+    <div class="w-full max-w-md card-glass p-6 rounded-3xl border border-white/10 space-y-4">
+      <div class="flex items-center justify-between">
+        <h3 class="font-editorial text-lg text-white font-medium">Cadastrar Anime</h3>
+        <button onclick="window.ParaSempreApp.closeModal('modal-add-anime')" class="text-slate-400 hover:text-white">
+          <span class="material-symbols-outlined">close</span>
+        </button>
+      </div>
+      <form onsubmit="window.ParaSempreApp.handleSubmitAnime(event)" class="space-y-4">
+        <div>
+          <label class="block text-xs uppercase text-slate-400 mb-1">Título do Anime</label>
+          <input type="text" id="anime-title" placeholder="Ex: Kimi no Na wa" class="w-full px-3.5 py-2.5 rounded-xl bg-slate-900 border border-slate-700 text-white text-sm focus:outline-none focus:border-purple-400" required/>
+        </div>
+        <div>
+          <label class="block text-xs uppercase text-slate-400 mb-1">URL da Imagem / Capa</label>
+          <input type="url" id="anime-image" placeholder="https://..." class="w-full px-3.5 py-2.5 rounded-xl bg-slate-900 border border-slate-700 text-white text-sm focus:outline-none focus:border-purple-400"/>
+        </div>
+        <div>
+          <label class="block text-xs uppercase text-slate-400 mb-1">Descrição / Sinopse (Opcional)</label>
+          <textarea id="anime-desc" rows="2" placeholder="Sinopse ou observações..." class="w-full px-3.5 py-2.5 rounded-xl bg-slate-900 border border-slate-700 text-white text-sm focus:outline-none focus:border-purple-400"></textarea>
+        </div>
+        <div class="flex items-center gap-2">
+          <input type="checkbox" id="anime-watched" class="rounded bg-slate-900 border-slate-700 text-purple-600 focus:ring-0"/>
+          <label for="anime-watched" class="text-xs text-slate-300">Já assistido</label>
+        </div>
+        <button type="submit" class="w-full py-2.5 rounded-xl bg-purple-600 hover:bg-purple-500 text-white text-sm font-medium">Cadastrar Anime</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal: Adicionar Filme -->
+  <div id="modal-add-movie" class="modal-overlay fixed inset-0 z-50 hidden flex items-center justify-center p-4">
+    <div class="w-full max-w-md card-glass p-6 rounded-3xl border border-white/10 space-y-4">
+      <div class="flex items-center justify-between">
+        <h3 class="font-editorial text-lg text-white font-medium">Cadastrar Filme</h3>
+        <button onclick="window.ParaSempreApp.closeModal('modal-add-movie')" class="text-slate-400 hover:text-white">
+          <span class="material-symbols-outlined">close</span>
+        </button>
+      </div>
+      <form onsubmit="window.ParaSempreApp.handleSubmitMovie(event)" class="space-y-4">
+        <div>
+          <label class="block text-xs uppercase text-slate-400 mb-1">Título do Filme</label>
+          <input type="text" id="movie-title" placeholder="Ex: Questão de Tempo" class="w-full px-3.5 py-2.5 rounded-xl bg-slate-900 border border-slate-700 text-white text-sm focus:outline-none focus:border-emerald-400" required/>
+        </div>
+        <div>
+          <label class="block text-xs uppercase text-slate-400 mb-1">URL do Pôster / Imagem</label>
+          <input type="url" id="movie-image" placeholder="https://..." class="w-full px-3.5 py-2.5 rounded-xl bg-slate-900 border border-slate-700 text-white text-sm focus:outline-none focus:border-emerald-400"/>
+        </div>
+        <div>
+          <label class="block text-xs uppercase text-slate-400 mb-1">Descrição / Comentário (Opcional)</label>
+          <textarea id="movie-desc" rows="2" placeholder="Comentários sobre o filme..." class="w-full px-3.5 py-2.5 rounded-xl bg-slate-900 border border-slate-700 text-white text-sm focus:outline-none focus:border-emerald-400"></textarea>
+        </div>
+        <div class="flex items-center gap-2">
+          <input type="checkbox" id="movie-watched" class="rounded bg-slate-900 border-slate-700 text-emerald-600 focus:ring-0"/>
+          <label for="movie-watched" class="text-xs text-slate-300">Já assistido</label>
+        </div>
+        <button type="submit" class="w-full py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-sm font-medium">Cadastrar Filme</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal: Adicionar Frase Romântica -->
+  <div id="modal-add-word" class="modal-overlay fixed inset-0 z-50 hidden flex items-center justify-center p-4">
+    <div class="w-full max-w-md card-glass p-6 rounded-3xl border border-white/10 space-y-4">
+      <div class="flex items-center justify-between">
+        <h3 class="font-editorial text-lg text-white font-medium">Adicionar Frase Especial</h3>
+        <button onclick="window.ParaSempreApp.closeModal('modal-add-word')" class="text-slate-400 hover:text-white">
+          <span class="material-symbols-outlined">close</span>
+        </button>
+      </div>
+      <form onsubmit="window.ParaSempreApp.handleSubmitWord(event)" class="space-y-4">
+        <div>
+          <label class="block text-xs uppercase text-slate-400 mb-1">Frase ou Pequeno Texto</label>
+          <textarea id="word-phrase" rows="3" placeholder="Escreva a frase que fica marcada..." class="w-full px-3.5 py-2.5 rounded-xl bg-slate-900 border border-slate-700 text-white text-sm focus:outline-none focus:border-red-400" required></textarea>
+        </div>
+        <div>
+          <label class="block text-xs uppercase text-slate-400 mb-1">Autor / Contexto (Opcional)</label>
+          <input type="text" id="word-context" placeholder="Ex: De você para mim" class="w-full px-3.5 py-2.5 rounded-xl bg-slate-900 border border-slate-700 text-white text-sm focus:outline-none focus:border-red-400"/>
+        </div>
+        <button type="submit" class="w-full py-2.5 rounded-xl bg-red-600 hover:bg-red-500 text-white text-sm font-medium">Salvar Frase</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal: Adicionar Destino (Mapa de Sonhos) -->
+  <div id="modal-add-place" class="modal-overlay fixed inset-0 z-50 hidden flex items-center justify-center p-4">
+    <div class="w-full max-w-md card-glass p-6 rounded-3xl border border-white/10 space-y-4">
+      <div class="flex items-center justify-between">
+        <h3 class="font-editorial text-lg text-white font-medium">Adicionar Destino dos Sonhos</h3>
+        <button onclick="window.ParaSempreApp.closeModal('modal-add-place')" class="text-slate-400 hover:text-white">
+          <span class="material-symbols-outlined">close</span>
+        </button>
+      </div>
+      <form onsubmit="window.ParaSempreApp.handleSubmitPlace(event)" class="space-y-4">
+        <div>
+          <label class="block text-xs uppercase text-slate-400 mb-1">Nome do Lugar / Cidade</label>
+          <input type="text" id="place-name" placeholder="Ex: Veneza" class="w-full px-3.5 py-2.5 rounded-xl bg-slate-900 border border-slate-700 text-white text-sm focus:outline-none focus:border-teal-400" required/>
+        </div>
+        <div>
+          <label class="block text-xs uppercase text-slate-400 mb-1">País</label>
+          <input type="text" id="place-country" placeholder="Ex: Itália" class="w-full px-3.5 py-2.5 rounded-xl bg-slate-900 border border-slate-700 text-white text-sm focus:outline-none focus:border-teal-400" required/>
+        </div>
+        <div>
+          <label class="block text-xs uppercase text-slate-400 mb-1">URL da Imagem / Foto</label>
+          <input type="url" id="place-image" placeholder="https://..." class="w-full px-3.5 py-2.5 rounded-xl bg-slate-900 border border-slate-700 text-white text-sm focus:outline-none focus:border-teal-400"/>
+        </div>
+        <div>
+          <label class="block text-xs uppercase text-slate-400 mb-1">Descrição / O que queremos fazer lá</label>
+          <textarea id="place-desc" rows="2" placeholder="Passear de gôndola e comer pizza..." class="w-full px-3.5 py-2.5 rounded-xl bg-slate-900 border border-slate-700 text-white text-sm focus:outline-none focus:border-teal-400"></textarea>
+        </div>
+        <div class="flex items-center gap-2">
+          <input type="checkbox" id="place-visited" class="rounded bg-slate-900 border-slate-700 text-teal-600 focus:ring-0"/>
+          <label for="place-visited" class="text-xs text-slate-300">Já visitamos juntos</label>
+        </div>
+        <button type="submit" class="w-full py-2.5 rounded-xl bg-teal-600 hover:bg-teal-500 text-white text-sm font-medium">Salvar Destino</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Scripts da Aplicação -->
+  <script src="config.js"></script>
+  <script src="db.js"></script>
+  <script src="auth.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
